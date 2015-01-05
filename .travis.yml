@@ -1,1 +1,10 @@
 language: java
+notifications:
+  email:
+    on_failure: change
+    on_success: never
+  campfire:
+    rooms:
+      - librato:49be337b3a309a143eba4d805414f770249e733f@581197
+    template:
+      - ! '[travis-ci] %{repository} (%{branch} : %{author}) %{message} %{build_url}'
