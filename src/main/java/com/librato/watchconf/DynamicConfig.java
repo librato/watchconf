@@ -20,8 +20,8 @@ public interface DynamicConfig<T> {
     /**
      * Retrieve the configuration
      *
-     * @return A reference to the configuration of type <T>.
-     * @throws Exception
+     * @return A reference to the configuration of type T.
+     * @throws Exception cannot retrieve instance of Optional T
      */
     Optional<T> get() throws Exception;
 
@@ -29,7 +29,7 @@ public interface DynamicConfig<T> {
      * Register a {@link com.librato.watchconf.DynamicConfig.ChangeListener} to be notified when configuration changes.
      *
      * @param changeListener {@link com.librato.watchconf.DynamicConfig.ChangeListener} to register.
-     * @throws Exception
+     * @throws Exception cannot register listener
      */
     void registerListener(ChangeListener changeListener) throws Exception;
 

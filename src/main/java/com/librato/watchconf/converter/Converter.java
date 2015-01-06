@@ -20,7 +20,7 @@ public interface Converter<T> {
     /**
      * Converts an instance of T to a byte[]
      *
-     * @param t and instance of type <T>
+     * @param t and instance of type T
      * @return the serialized byte[] of t
      * @throws Exception unable to convert to bytes
      */
