@@ -4,7 +4,7 @@
 
     <groupId>com.librato.watchconf</groupId>
     <artifactId>watchconf</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>0.0.1-SNAPSHOT</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <curator.version>2.7.0</curator.version>

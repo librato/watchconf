@@ -8,21 +8,21 @@ package com.librato.watchconf.converter;
 public interface Converter<T> {
 
     /**
-     * Converts a byte[] to an instance of <T>
+     * Converts a byte[] to an instance of T
      *
      * @param bytes The serialized object in bytes.
      * @param clazz The class of type T
-     * @return a deserialized instance of <T>
-     * @throws Exception
+     * @return a deserialized instance of T
+     * @throws Exception unable to convert to T
      */
     T toDomain(byte[] bytes, Class<T> clazz) throws Exception;
 
     /**
-     * Converts an instance of <T> to a byte[]
+     * Converts an instance of T to a byte[]
      *
      * @param t and instance of type <T>
      * @return the serialized byte[] of t
-     * @throws Exception
+     * @throws Exception unable to convert to bytes
      */
     byte[] fromDomain(T t) throws Exception;
 }
