@@ -108,6 +108,7 @@ public class DynamicConfigZKAdapterIT {
                 countDownLatch.countDown();
             }
         });
+
         Executors.newSingleThreadScheduledExecutor().schedule(new Callable<Void>() {
             @Override
             public Void call() throws Exception {

@@ -11,6 +11,16 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <curator.version>2.7.0</curator.version>
     </properties>
+
+    <name>watchconf</name>
+    <url>https://github.com/librato/watchconf</url>
+
+    <scm>
+        <url>https://github.com/librato/watchconf/</url>
+        <connection>scm:git:git://github.com/librato/watchconf</connection>
+        <developerConnection>scm:git:git@github.com:librato/watchconf</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
     <build>
         <plugins>
             <plugin>

@@ -21,9 +21,9 @@ public abstract class DynamicConfigZKAdapter<T> implements DynamicConfig<T> {
     private final CuratorFramework curatorFramework;
     private final NodeCacheListener nodeCacheListener;
     private final Class<T> clazz;
-    private NodeCache nodeCache;
+    private final NodeCache nodeCache;
     private final List<ChangeListener> changeListenerList = new ArrayList();
-    private AtomicReference<Optional<T>> config = new AtomicReference(Optional.absent());
+    private final AtomicReference<Optional<T>> config = new AtomicReference(Optional.absent());
     private final Converter<T> converter;
 
     public DynamicConfigZKAdapter(String path, CuratorFramework curatorFramework, Converter converter, ChangeListener changeListener) throws Exception {
@@ -85,7 +85,6 @@ public abstract class DynamicConfigZKAdapter<T> implements DynamicConfig<T> {
             config.set(Optional.of(converter.toDomain(curatorFramework.getData().forPath(path), clazz)));
         } catch (Exception ex) {
             log.error("unable to parse config", ex);
-            config.set(Optional.<T>absent());
         }
     }
 }
