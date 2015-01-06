@@ -4,13 +4,15 @@ import com.google.common.base.Optional;
 
 /**
  * A base interface for a watchable configuration.
- * @author Ray Jenkins
+ *
  * @param <T> The type of configuration referred to by this DynamicConfig.
+ * @author Ray Jenkins
  */
 public interface DynamicConfig<T> {
 
     /**
      * A base interface for notification of configuration change.
+     *
      * @param <T> The type of configuration referred to by this ChangeListener
      */
     public interface ChangeListener<T> {
@@ -35,6 +37,7 @@ public interface DynamicConfig<T> {
 
     /**
      * Remove a {@link com.librato.watchconf.DynamicConfig.ChangeListener}
+     *
      * @param changeListener {@link com.librato.watchconf.DynamicConfig.ChangeListener} to remove.
      */
     void removeListener(ChangeListener changeListener);
