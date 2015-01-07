@@ -28,7 +28,7 @@ public class WatchConf {
         String outputFlag = args[4];
         String znodeFlag = args[6];
 
-        if (!"-format".equals(formatFlag) || !"-f".equals(fileFlag) || !"-output".equals(outputFlag) || !"-z".equals(znodeFlag)) {
+        if (!"-format".equals(formatFlag) || !"-f".equals(fileFlag) || !"-o".equals(outputFlag) || !"-z".equals(znodeFlag)) {
             printHelp();
             return;
         }
@@ -91,7 +91,7 @@ public class WatchConf {
     private static void printHelp() {
         System.out.println("watchconf: Must specify -format [yaml|json] and additional required flags");
         System.out.println("-f <file>: input file to read from");
-        System.out.println("-output [yaml|json]: format of data to output to znode ");
+        System.out.println("-o [yaml|json]: format of data to output to znode");
         System.out.println("-z: full path to znode to update, will create parents and node doesn't exist");
     }
 }
