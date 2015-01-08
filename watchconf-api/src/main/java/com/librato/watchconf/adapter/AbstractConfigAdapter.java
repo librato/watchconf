@@ -18,16 +18,13 @@ public class AbstractConfigAdapter<T, V> implements DynamicConfig<T> {
     protected final Converter<T, V> converter;
 
     protected AbstractConfigAdapter(Converter<T, V> converter, Optional<ChangeListener<T>> changeListener) {
-        this(converter);
+        Preconditions.checkArgument(converter != null, "converter cannot be null");
+        this.converter = converter;
+        this.clazz = getClassForType();
+
         if (changeListener.isPresent()) {
             registerListener(changeListener.get());
         }
-    }
-
-    protected AbstractConfigAdapter(Converter<T, V> converter) {
-        Preconditions.checkNotNull(converter, "converter cannot be null");
-        this.converter = converter;
-        this.clazz = getClassForType();
     }
 
     public Optional<T> get() throws Exception {
@@ -53,6 +50,4 @@ public class AbstractConfigAdapter<T, V> implements DynamicConfig<T> {
         return (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass())
                 .getActualTypeArguments()[0];
     }
-
-
 }

@@ -23,6 +23,7 @@ public class FileAdapter<T> extends AbstractConfigAdapter<T, byte[]> {
     public FileAdapter(String path, Converter<T, byte[]> converter, ChangeListener<T> changeListener) throws IOException, InterruptedException {
         super(converter, Optional.fromNullable(changeListener));
         Preconditions.checkArgument(path != null && !path.isEmpty(), "path cannot be null or blank");
+        Preconditions.checkArgument(converter != null, "converter cannot be null");
         this.file = new File(stripSlash(path));
 
         getAndSet();

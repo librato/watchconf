@@ -8,15 +8,17 @@ import org.apache.log4j.Logger;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPubSub;
 
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class RedisAdapter<T> extends AbstractConfigAdapter<T, byte[]> {
 
     private final Logger log = Logger.getLogger(RedisAdapter.class);
     private final JedisPool jedisPool;
     private final String path;
-    private final Executor redisExecutor = Executors.newSingleThreadExecutor();
+    private final ExecutorService redisExecutor = Executors.newSingleThreadExecutor();
+    private final Converter<T, byte[]> converter;
 
     public RedisAdapter(String path, JedisPool jedisPool, Converter<T, byte[]> converter) throws Exception {
         this(path, jedisPool, converter, null);
@@ -24,8 +26,10 @@ public class RedisAdapter<T> extends AbstractConfigAdapter<T, byte[]> {
 
     public RedisAdapter(final String path, final JedisPool jedisPool, Converter<T, byte[]> converter, ChangeListener<T> changeListener) throws Exception {
         super(converter, Optional.fromNullable(changeListener));
+        Preconditions.checkArgument(converter != null, "converter cannot be null");
         Preconditions.checkArgument(path != null && !path.isEmpty(), "path cannot be null or blank");
         this.path = path;
+        this.converter = converter;
         this.jedisPool = jedisPool;
         getAndSet();
 
@@ -70,6 +74,17 @@ public class RedisAdapter<T> extends AbstractConfigAdapter<T, byte[]> {
         });
     }
 
+    public void shutdown() throws InterruptedException {
+        redisExecutor.shutdown();
+        log.info("Waiting for redisExecutor to stop in 10s");
+        if (!redisExecutor.awaitTermination(10, TimeUnit.SECONDS)) {
+            log.error("redisExecutor did not stop after waiting for 10s");
+            redisExecutor.shutdownNow();
+        } else {
+            log.info("redisExecutor stopped");
+        }
+    }
+
     private void getAndSet() {
         try {
             config.set(Optional.of(converter.toDomain(jedisPool.getResource().get(path).getBytes(), clazz)));
@@ -77,4 +92,6 @@ public class RedisAdapter<T> extends AbstractConfigAdapter<T, byte[]> {
             log.error("unable to parse config", ex);
         }
     }
+
+
 }

@@ -1,7 +1,7 @@
 package com.librato.watchconf.adapter.zookeeper;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.librato.ExampleConfig;
 import com.librato.watchconf.converter.JsonConverter;
 import org.apache.curator.CuratorZookeeperClient;
 import org.apache.curator.framework.CuratorFramework;
@@ -11,7 +11,7 @@ import org.apache.curator.utils.EnsurePath;
 import org.apache.zookeeper.data.Stat;
 import org.junit.Test;
 
-import static junit.framework.Assert.assertEquals;
+import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertTrue;
 import static org.mockito.Matchers.any;
@@ -20,11 +20,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class DynamicConfigZKAdapterTest {
-
-    public static class ExampleConfig {
-        @JsonProperty
-        String name;
-    }
 
     private class ExampleConfigAdapter extends ZKAdapter<ExampleConfig> {
 

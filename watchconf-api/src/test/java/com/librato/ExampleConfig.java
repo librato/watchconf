@@ -11,8 +11,12 @@ public class ExampleConfig {
 
     public static class Thing {
         public String name;
-        public Thing() {}
-        public Thing(String name) {this.name = name;}
 
+        public Thing() {
+        }
+
+        public Thing(String name) {
+            this.name = name;
+        }
     }
 }
