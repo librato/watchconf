@@ -1,8 +1,8 @@
 package com.librato.watchconf.adapter.zookeeper;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
+import com.librato.ExampleConfig;
 import com.librato.watchconf.DynamicConfig;
 import com.librato.watchconf.converter.JsonConverter;
 import org.apache.curator.framework.CuratorFramework;
@@ -24,11 +24,6 @@ public class DynamicConfigZKAdapterIT {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    public static class ExampleConfig {
-        @JsonProperty
-        String name;
-    }
-
     private class ExampleConfigAdapter extends ZKAdapter<ExampleConfig> {
 
         public ExampleConfigAdapter(CuratorFramework curatorFramework) throws Exception {
@@ -49,7 +44,7 @@ public class DynamicConfigZKAdapterIT {
                 .build();
         framework.start();
 
-        if(framework.checkExists().forPath("/watchconf/test/config") != null) {
+        if (framework.checkExists().forPath("/watchconf/test/config") != null) {
             framework.delete().deletingChildrenIfNeeded().forPath("/watchconf");
         }
     }

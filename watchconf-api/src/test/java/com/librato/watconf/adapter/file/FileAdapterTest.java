@@ -1,6 +1,7 @@
 package com.librato.watconf.adapter.file;
 
 import com.google.common.base.Optional;
+import com.librato.ExampleConfig;
 import com.librato.watchconf.DynamicConfig;
 import com.librato.watchconf.adapter.file.FileAdapter;
 import com.librato.watchconf.converter.Converter;
@@ -10,29 +11,13 @@ import org.junit.Test;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 
-/**
- * Created by rjenkins on 1/8/15.
- */
 public class FileAdapterTest {
-
-    public static class ExampleConfig {
-
-        public int id;
-        public String name;
-        public List<Thing> things = new ArrayList();
-    }
-
-    public static class Thing {
-        public String name;
-    }
 
     public static class ExampleConfigAdapter extends FileAdapter<ExampleConfig> {
         public ExampleConfigAdapter(String path, Converter<ExampleConfig> converter) throws IOException, InterruptedException {
