@@ -17,24 +17,25 @@ import java.util.concurrent.TimeUnit;
 public class FileAdapter<T> extends AbstractConfigAdapter<T> {
 
     private static final Logger log = Logger.getLogger(FileAdapter.class);
-    private final String path;
     private final File file;
     private final Executor fileWatchExecutor = Executors.newSingleThreadExecutor();
 
-    public FileAdapter(String path, Converter<T> converter) throws IOException, InterruptedException {
-        super(converter);
+    public FileAdapter(String path, Converter<T> converter, ChangeListener<T> changeListener) throws IOException, InterruptedException {
+        super(converter, Optional.fromNullable(changeListener));
         Preconditions.checkArgument(path != null && !path.isEmpty(), "path cannot be null or blank");
-        Preconditions.checkNotNull(converter, "converter cannot be null");
-        this.path = stripSlash(path);
-        this.file = new File(path);
+        this.file = new File(stripSlash(path));
 
         getAndSet();
 
         WatchService watcher = FileSystems.getDefault().newWatchService();
         Path dir = Paths.get(path.substring(0, path.lastIndexOf("/")));
-        WatchQueueReader fileWatcher = new WatchQueueReader(watcher, dir.toString(), this);
+        WatchQueueReader fileWatcher = new WatchQueueReader(watcher, path.substring(path.lastIndexOf("/") + 1), this);
         dir.register(watcher, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY);
         fileWatchExecutor.execute(fileWatcher);
+    }
+
+    public FileAdapter(String path, Converter<T> converter) throws IOException, InterruptedException {
+        this(path, converter, null);
     }
 
     private String stripSlash(String path) {
@@ -99,11 +100,9 @@ public class FileAdapter<T> extends AbstractConfigAdapter<T> {
                 if (key != null) {
 
                     for (WatchEvent<?> event : key.pollEvents()) {
-                        // get event type
-                        @SuppressWarnings("unchecked")
                         WatchEvent<Path> ev = (WatchEvent<Path>) event;
                         Path fileName = ev.context();
-                        if (this.fileName.equals(fileName)) {
+                        if (this.fileName.equals(fileName.toString())) {
                             adapter.getAndSet();
                             adapter.notifyListeners();
                         }

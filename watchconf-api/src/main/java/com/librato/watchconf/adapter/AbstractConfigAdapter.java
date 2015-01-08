@@ -1,6 +1,7 @@
 package com.librato.watchconf.adapter;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 import com.librato.watchconf.DynamicConfig;
 import com.librato.watchconf.converter.Converter;
 
@@ -16,7 +17,15 @@ public class AbstractConfigAdapter<T> implements DynamicConfig<T> {
     protected final AtomicReference<Optional<T>> config = new AtomicReference(Optional.absent());
     protected final Converter<T> converter;
 
+    protected AbstractConfigAdapter(Converter<T> converter, Optional<ChangeListener<T>> changeListener) {
+        this(converter);
+        if (changeListener.isPresent()) {
+            registerListener(changeListener.get());
+        }
+    }
+
     protected AbstractConfigAdapter(Converter<T> converter) {
+        Preconditions.checkNotNull(converter, "converter cannot be null");
         this.converter = converter;
         this.clazz = getClassForType();
     }
@@ -25,7 +34,7 @@ public class AbstractConfigAdapter<T> implements DynamicConfig<T> {
         return config.get();
     }
 
-    public void registerListener(ChangeListener changeListener) throws Exception {
+    public void registerListener(ChangeListener changeListener) {
         changeListenerList.add(changeListener);
     }
 
