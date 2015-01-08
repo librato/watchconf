@@ -26,7 +26,7 @@ public class FileAdapter<T> extends AbstractConfigAdapter<T, byte[]> {
         Preconditions.checkArgument(converter != null, "converter cannot be null");
         this.file = new File(stripSlash(path));
 
-        getAndSet();
+        getAndSet(readFile());
 
         WatchService watcher = FileSystems.getDefault().newWatchService();
         Path dir = Paths.get(path.substring(0, path.lastIndexOf("/")));
@@ -46,16 +46,16 @@ public class FileAdapter<T> extends AbstractConfigAdapter<T, byte[]> {
         return path;
     }
 
-    public void getAndSet() {
+    public byte[] readFile() {
         FileInputStream fileInputStream = null;
 
         try {
             fileInputStream = new FileInputStream(file);
             byte[] data = new byte[(int) file.length()];
             fileInputStream.read(data);
-            config.set(Optional.of(converter.toDomain(data, clazz)));
+            return data;
         } catch (Exception ex) {
-            log.error("unable to parse config", ex);
+            log.error("error reading file", ex);
         } finally {
             if (fileInputStream != null)
                 try {
@@ -64,6 +64,8 @@ public class FileAdapter<T> extends AbstractConfigAdapter<T, byte[]> {
                     log.error("error closing FileInputStream", ex);
                 }
         }
+
+        return null;
     }
 
     private static class WatchQueueReader implements Runnable {
@@ -104,7 +106,7 @@ public class FileAdapter<T> extends AbstractConfigAdapter<T, byte[]> {
                         WatchEvent<Path> ev = (WatchEvent<Path>) event;
                         Path fileName = ev.context();
                         if (this.fileName.equals(fileName.toString())) {
-                            adapter.getAndSet();
+                            adapter.getAndSet(adapter.readFile());
                             adapter.notifyListeners();
                         }
                     }

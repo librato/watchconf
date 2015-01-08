@@ -12,29 +12,25 @@ import org.apache.log4j.Logger;
 public abstract class ZKAdapter<T> extends AbstractConfigAdapter<T, byte[]> {
 
     private static final Logger log = Logger.getLogger(ZKAdapter.class);
-    private final String path;
-    private final CuratorFramework curatorFramework;
     private final NodeCacheListener nodeCacheListener;
     private final NodeCache nodeCache;
 
-    public ZKAdapter(String path, CuratorFramework curatorFramework, Converter<T, byte[]> converter, ChangeListener<T> changeListener) throws Exception {
+    public ZKAdapter(final String path, final CuratorFramework curatorFramework, Converter<T, byte[]> converter, ChangeListener<T> changeListener) throws Exception {
         super(converter, Optional.fromNullable(changeListener));
         Preconditions.checkArgument(path != null && !path.isEmpty(), "path cannot be null or blank");
         Preconditions.checkNotNull(curatorFramework, "CuratorFramework cannot be null");
-        this.path = path;
-        this.curatorFramework = curatorFramework;
 
         if (curatorFramework.checkExists().forPath(path) == null) {
             curatorFramework.create().creatingParentsIfNeeded().forPath(path);
         }
 
-        getAndSet();
+        getAndSet(curatorFramework.getData().forPath(path));
 
         this.nodeCache = new NodeCache(curatorFramework, path);
         this.nodeCacheListener = new NodeCacheListener() {
             @Override
             public void nodeChanged() throws Exception {
-                getAndSet();
+                getAndSet(curatorFramework.getData().forPath(path));
                 notifyListeners();
             }
         };
@@ -45,13 +41,5 @@ public abstract class ZKAdapter<T> extends AbstractConfigAdapter<T, byte[]> {
 
     public ZKAdapter(String path, CuratorFramework curatorFramework, Converter converter) throws Exception {
         this(path, curatorFramework, converter, null);
-    }
-
-    private void getAndSet() {
-        try {
-            config.set(Optional.of(converter.toDomain(curatorFramework.getData().forPath(path), clazz)));
-        } catch (Exception ex) {
-            log.error("unable to parse config", ex);
-        }
     }
 }

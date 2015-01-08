@@ -16,9 +16,8 @@ public class RedisAdapter<T> extends AbstractConfigAdapter<T, byte[]> {
 
     private final Logger log = Logger.getLogger(RedisAdapter.class);
     private final JedisPool jedisPool;
-    private final String path;
     private final ExecutorService redisExecutor = Executors.newSingleThreadExecutor();
-    private final Converter<T, byte[]> converter;
+    private final String path;
 
     public RedisAdapter(String path, JedisPool jedisPool, Converter<T, byte[]> converter) throws Exception {
         this(path, jedisPool, converter, null);
@@ -26,12 +25,11 @@ public class RedisAdapter<T> extends AbstractConfigAdapter<T, byte[]> {
 
     public RedisAdapter(final String path, final JedisPool jedisPool, Converter<T, byte[]> converter, ChangeListener<T> changeListener) throws Exception {
         super(converter, Optional.fromNullable(changeListener));
-        Preconditions.checkArgument(converter != null, "converter cannot be null");
         Preconditions.checkArgument(path != null && !path.isEmpty(), "path cannot be null or blank");
-        this.path = path;
-        this.converter = converter;
         this.jedisPool = jedisPool;
-        getAndSet();
+        this.path = path;
+
+        getAndSet(jedisPool.getResource().get(path).getBytes());
 
         jedisPool.getResource().configSet("notify-keyspace-events", "AKE");
         redisExecutor.execute(new Runnable() {
@@ -47,8 +45,12 @@ public class RedisAdapter<T> extends AbstractConfigAdapter<T, byte[]> {
 
                     @Override
                     public void onPMessage(String s, String s1, String s2) {
-                        getAndSet();
-                        notifyListeners();
+                        String value = jedisPool.getResource().get(path);
+                        if(value != null) {
+                            getAndSet(value.getBytes());
+                            notifyListeners();
+                        }
+
                     }
 
                     @Override
@@ -83,15 +85,7 @@ public class RedisAdapter<T> extends AbstractConfigAdapter<T, byte[]> {
         } else {
             log.info("redisExecutor stopped");
         }
+
+        jedisPool.close();
     }
-
-    private void getAndSet() {
-        try {
-            config.set(Optional.of(converter.toDomain(jedisPool.getResource().get(path).getBytes(), clazz)));
-        } catch (Exception ex) {
-            log.error("unable to parse config", ex);
-        }
-    }
-
-
 }

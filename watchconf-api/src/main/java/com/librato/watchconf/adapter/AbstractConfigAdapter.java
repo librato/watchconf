@@ -4,6 +4,8 @@ import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.librato.watchconf.DynamicConfig;
 import com.librato.watchconf.converter.Converter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
@@ -12,6 +14,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class AbstractConfigAdapter<T, V> implements DynamicConfig<T> {
 
+    private static final Logger log = LoggerFactory.getLogger(AbstractConfigAdapter.class);
     protected final Class<T> clazz;
     protected final List<ChangeListener> changeListenerList = new ArrayList();
     protected final AtomicReference<Optional<T>> config = new AtomicReference(Optional.absent());
@@ -29,6 +32,14 @@ public class AbstractConfigAdapter<T, V> implements DynamicConfig<T> {
 
     public Optional<T> get() throws Exception {
         return config.get();
+    }
+
+    protected void getAndSet(V v) {
+        try {
+            config.set(Optional.of(converter.toDomain(v, clazz)));
+        } catch (Exception ex) {
+            log.error("unable to parse config", ex);
+        }
     }
 
     public void registerListener(ChangeListener changeListener) {
