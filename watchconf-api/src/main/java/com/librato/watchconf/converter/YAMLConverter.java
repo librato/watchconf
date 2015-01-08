@@ -3,7 +3,7 @@ package com.librato.watchconf.converter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
-public class YAMLConverter<T> implements Converter<T> {
+public class YAMLConverter<T> implements Converter<T, byte[]> {
 
     private static final ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
 

@@ -11,18 +11,18 @@ import redis.clients.jedis.JedisPubSub;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-public class RedisAdapter<T> extends AbstractConfigAdapter<T> {
+public class RedisAdapter<T> extends AbstractConfigAdapter<T, byte[]> {
 
     private final Logger log = Logger.getLogger(RedisAdapter.class);
     private final JedisPool jedisPool;
     private final String path;
     private final Executor redisExecutor = Executors.newSingleThreadExecutor();
 
-    public RedisAdapter(String path, JedisPool jedisPool, Converter<T> converter) throws Exception {
+    public RedisAdapter(String path, JedisPool jedisPool, Converter<T, byte[]> converter) throws Exception {
         this(path, jedisPool, converter, null);
     }
 
-    public RedisAdapter(final String path, final JedisPool jedisPool, Converter<T> converter, ChangeListener<T> changeListener) throws Exception {
+    public RedisAdapter(final String path, final JedisPool jedisPool, Converter<T, byte[]> converter, ChangeListener<T> changeListener) throws Exception {
         super(converter, Optional.fromNullable(changeListener));
         Preconditions.checkArgument(path != null && !path.isEmpty(), "path cannot be null or blank");
         this.path = path;
@@ -68,8 +68,6 @@ public class RedisAdapter<T> extends AbstractConfigAdapter<T> {
                 }, "__key*__:" + path);
             }
         });
-
-
     }
 
     private void getAndSet() {

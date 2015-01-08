@@ -9,7 +9,7 @@ import org.apache.curator.framework.recipes.cache.NodeCache;
 import org.apache.curator.framework.recipes.cache.NodeCacheListener;
 import org.apache.log4j.Logger;
 
-public abstract class ZKAdapter<T> extends AbstractConfigAdapter<T> {
+public abstract class ZKAdapter<T> extends AbstractConfigAdapter<T, byte[]> {
 
     private static final Logger log = Logger.getLogger(ZKAdapter.class);
     private final String path;
@@ -17,7 +17,7 @@ public abstract class ZKAdapter<T> extends AbstractConfigAdapter<T> {
     private final NodeCacheListener nodeCacheListener;
     private final NodeCache nodeCache;
 
-    public ZKAdapter(String path, CuratorFramework curatorFramework, Converter<T> converter, ChangeListener<T> changeListener) throws Exception {
+    public ZKAdapter(String path, CuratorFramework curatorFramework, Converter<T, byte[]> converter, ChangeListener<T> changeListener) throws Exception {
         super(converter, Optional.fromNullable(changeListener));
         Preconditions.checkArgument(path != null && !path.isEmpty(), "path cannot be null or blank");
         Preconditions.checkNotNull(curatorFramework, "CuratorFramework cannot be null");

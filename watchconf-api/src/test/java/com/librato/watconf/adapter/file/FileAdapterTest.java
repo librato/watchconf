@@ -20,11 +20,11 @@ import static junit.framework.Assert.assertTrue;
 public class FileAdapterTest {
 
     public static class ExampleConfigAdapter extends FileAdapter<ExampleConfig> {
-        public ExampleConfigAdapter(String path, Converter<ExampleConfig> converter) throws IOException, InterruptedException {
+        public ExampleConfigAdapter(String path, Converter<ExampleConfig, byte[]> converter) throws IOException, InterruptedException {
             super(path, converter);
         }
 
-        public ExampleConfigAdapter(String path, Converter<ExampleConfig> converter, ChangeListener<ExampleConfig> changeListener) throws IOException, InterruptedException {
+        public ExampleConfigAdapter(String path, Converter<ExampleConfig, byte[]> converter, ChangeListener<ExampleConfig> changeListener) throws IOException, InterruptedException {
             super(path, converter, changeListener);
         }
     }

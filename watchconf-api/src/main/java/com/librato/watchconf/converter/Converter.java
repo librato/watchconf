@@ -5,17 +5,16 @@ package com.librato.watchconf.converter;
  * A base interface for serializing and de-serializing objects from to and front a byte[]
  * @param <T> The type of object this converter converts.
  */
-public interface Converter<T> {
+public interface Converter<T, V> {
 
     /**
-     * Converts a byte[] to an instance of T
-     *
-     * @param bytes The serialized object in bytes.
+     * Converts a value of type V to an instance of T
+     * @param v type value type
      * @param clazz The class of type T
      * @return a deserialized instance of T
      * @throws Exception unable to convert to T
      */
-    T toDomain(byte[] bytes, Class<T> clazz) throws Exception;
+    T toDomain(V v, Class<T> clazz) throws Exception;
 
     /**
      * Converts an instance of T to a byte[]
@@ -24,5 +23,5 @@ public interface Converter<T> {
      * @return the serialized byte[] of t
      * @throws Exception unable to convert to bytes
      */
-    byte[] fromDomain(T t) throws Exception;
+    V fromDomain(T t) throws Exception;
 }

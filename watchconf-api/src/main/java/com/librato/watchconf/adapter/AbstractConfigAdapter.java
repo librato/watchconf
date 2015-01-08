@@ -10,21 +10,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class AbstractConfigAdapter<T> implements DynamicConfig<T> {
+public class AbstractConfigAdapter<T, V> implements DynamicConfig<T> {
 
     protected final Class<T> clazz;
     protected final List<ChangeListener> changeListenerList = new ArrayList();
     protected final AtomicReference<Optional<T>> config = new AtomicReference(Optional.absent());
-    protected final Converter<T> converter;
+    protected final Converter<T, V> converter;
 
-    protected AbstractConfigAdapter(Converter<T> converter, Optional<ChangeListener<T>> changeListener) {
+    protected AbstractConfigAdapter(Converter<T, V> converter, Optional<ChangeListener<T>> changeListener) {
         this(converter);
         if (changeListener.isPresent()) {
             registerListener(changeListener.get());
         }
     }
 
-    protected AbstractConfigAdapter(Converter<T> converter) {
+    protected AbstractConfigAdapter(Converter<T, V> converter) {
         Preconditions.checkNotNull(converter, "converter cannot be null");
         this.converter = converter;
         this.clazz = getClassForType();

@@ -10,7 +10,7 @@ import java.io.IOException;
  * JSON/POJOs
  * @param <T> the type referenced by this converter
  */
-public class JsonConverter<T> implements Converter<T> {
+public class JsonConverter<T> implements Converter<T, byte[]> {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 

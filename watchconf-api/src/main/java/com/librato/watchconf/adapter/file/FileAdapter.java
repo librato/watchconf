@@ -14,13 +14,13 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class FileAdapter<T> extends AbstractConfigAdapter<T> {
+public class FileAdapter<T> extends AbstractConfigAdapter<T, byte[]> {
 
     private static final Logger log = Logger.getLogger(FileAdapter.class);
     private final File file;
     private final Executor fileWatchExecutor = Executors.newSingleThreadExecutor();
 
-    public FileAdapter(String path, Converter<T> converter, ChangeListener<T> changeListener) throws IOException, InterruptedException {
+    public FileAdapter(String path, Converter<T, byte[]> converter, ChangeListener<T> changeListener) throws IOException, InterruptedException {
         super(converter, Optional.fromNullable(changeListener));
         Preconditions.checkArgument(path != null && !path.isEmpty(), "path cannot be null or blank");
         this.file = new File(stripSlash(path));
@@ -34,7 +34,7 @@ public class FileAdapter<T> extends AbstractConfigAdapter<T> {
         fileWatchExecutor.execute(fileWatcher);
     }
 
-    public FileAdapter(String path, Converter<T> converter) throws IOException, InterruptedException {
+    public FileAdapter(String path, Converter<T, byte[]> converter) throws IOException, InterruptedException {
         this(path, converter, null);
     }
 
