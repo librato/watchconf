@@ -4,7 +4,8 @@ import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.librato.watchconf.adapter.AbstractConfigAdapter;
 import com.librato.watchconf.converter.Converter;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPubSub;
 
@@ -14,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 
 public abstract class DynamicConfigRedisAdapter<T> extends AbstractConfigAdapter<T, byte[]> {
 
-    private final Logger log = Logger.getLogger(DynamicConfigRedisAdapter.class);
+    private final Logger log = LoggerFactory.getLogger(DynamicConfigRedisAdapter.class);
     private final JedisPool jedisPool;
     private final ExecutorService redisExecutor = Executors.newSingleThreadExecutor();
     private final String path;

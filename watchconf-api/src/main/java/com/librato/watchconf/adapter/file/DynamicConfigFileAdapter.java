@@ -4,7 +4,8 @@ import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.librato.watchconf.adapter.AbstractConfigAdapter;
 import com.librato.watchconf.converter.Converter;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 
 public abstract class DynamicConfigFileAdapter<T> extends AbstractConfigAdapter<T, byte[]> {
 
-    private static final Logger log = Logger.getLogger(DynamicConfigFileAdapter.class);
+    private static final Logger log = LoggerFactory.getLogger(DynamicConfigFileAdapter.class);
     private final File file;
     private final Executor fileWatchExecutor = Executors.newSingleThreadExecutor();
 
