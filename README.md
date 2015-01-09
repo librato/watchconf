@@ -49,7 +49,6 @@ Adapters use the ```Converter``` interface to convert serialized configuration i
 
 ```java
 public interface Converter<T, V> {
-
     T toDomain(V v, Class<T> clazz) throws Exception;
     V fromDomain(T t) throws Exception;
 }
@@ -88,7 +87,6 @@ public class WebServiceConfig {
 In order to watch our ```WebServiceConfig``` we first need a ```CuratorFramework``` instance and then we extend the Zookeeper adapter and use the JsonConverter.
 
 ```java
-
  public static class WebServiceAdapter extends DynamicConfigZKAdapter<WebServiceConfig> 
    implements ChangeListener<WebServiceConfig> {
     
@@ -110,3 +108,23 @@ In order to watch our ```WebServiceConfig``` we first need a ```CuratorFramework
   
  DynamicConfig<WebServiceConfig> config = new WebServiceAdapter(framwork);
 ```
+
+# Operational Concerns
+
+Upon initial instantiatation of an adapter if there are errors parsing a configuration or if the resource is non-existant the ```Optional<T> get()``` method of ```DynamicConfig``` will return a ```Optional.absent()```. If during operation configuration changes are made and errors are encountered parsing the updated configuration a log message will be written ```log.error("unable to parse config", ex);``` but the previous configuration will still be present in calls to ```Optional<T> get()```. This is by design as we wish to avoid impacting a running service due to a configuration change error.
+
+## Watchconf-util
+
+The watchconf-util package comes with a utility for parsing and pushing configuration into zookeeper. At librato we keep configuration in YAML stored in a repo. If I want to push changes to a cluster I would update the YAML, push to our repo and deploy to Zookeeper. To run the configuration push utility enter
+
+```java -jar ./target/watchconf-util-0.0.5-SNAPSHOT.jar```
+
+You will be prompted to supply arguments for 4 flags
+
+```
+watchconf: Must specify -format [yaml|json] and additional required flags
+-f <file>: input file to read from
+-o [yaml|json]: format of data to output to znode
+-z: full path to znode to update, will create parents and node doesn't exist
+```
+
