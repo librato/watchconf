@@ -89,7 +89,9 @@ In order to watch our ```WebServiceConfig``` we first need a ```CuratorFramework
 
 ```java
 
- public static class WebServiceAdapter extends DynamicConfigZKAdapter<WebServiceConfig> implements  ChangeListener<WebServiceConfig> {
+ public static class WebServiceAdapter extends DynamicConfigZKAdapter<WebServiceConfig> 
+   implements  ChangeListener<WebServiceConfig> {
+    
     public ExampleConfigAdapter(CuratorFramework curatorFramework) throws Exception {
       super("/services/webservice/config", curatorFramework, new JsonConverter<ExampleConfig>());
     }
