@@ -3,7 +3,7 @@ Overview
 
 Most of the time if you need to make a configuration change to a service you can modify a file, deploy and perform a rolling restart across the cluster. But sometimes you would rather not restart, watchconf aims to address those instances.
 
-Watchconf provides a simple read-only interface and several adapters for monitoring data from various sources, so when your configuration changes you're notified.
+Watchconf provides a simple read-only interface and several adapters for monitoring data from various sources, so when configuration changes you're notified.
 
 ## Maven dependency
 
@@ -46,7 +46,7 @@ Watchconf provides abstract adapter implementations for each source supported by
 
 ### Converters
 
-Adapters use the ```Converter``` interface to convert serialized configuration into objects. Watchconf provides converter for various data formats including [JSON](https://github.com/librato/watchconf/blob/master/watchconf-api/src/main/java/com/librato/watchconf/converter/JsonConverter.java) and [YAML](https://github.com/librato/watchconf/blob/master/watchconf-api/src/main/java/com/librato/watchconf/converter/YAMLConverter.java). If you need to support another format simply implement a converter.
+Adapters use the ```Converter``` interface to convert serialized configuration into objects. Watchconf provides converters for various data formats including [JSON](https://github.com/librato/watchconf/blob/master/watchconf-api/src/main/java/com/librato/watchconf/converter/JsonConverter.java) and [YAML](https://github.com/librato/watchconf/blob/master/watchconf-api/src/main/java/com/librato/watchconf/converter/YAMLConverter.java). If you need to support another format simply implement a converter.
 
 ```java
 public interface Converter<T, V> {
@@ -113,7 +113,7 @@ In order to watch our ```WebServiceConfig``` we first need a ```CuratorFramework
 
 # Operational Concerns
 
-Upon initial instantiatation of an adapter if there are errors parsing a configuration or if the resource is non-existant the ```Optional<T> get()``` method of ```DynamicConfig``` will return a ```Optional.absent()```. If during operation configuration changes are made and errors are encountered parsing the updated configuration a log message will be written ```log.error("unable to parse config", ex);``` and any ChangeListeners will be notified, but the previous configuration will still be present in calls to ```Optional<T> get()```. This is by design as we wish to avoid impacting a running service due to a configuration change error.
+Upon initial instantiatation of an adapter if there are errors parsing a configuration or if the resource is non-existant the ```Optional<T> get()``` method of ```DynamicConfig``` will return a ```Optional.absent()```. If during operation configuration changes are made and errors are encountered parsing the updated configuration a log message will be written ```log.error("unable to parse config", ex);``` and any ChangeListeners will be notified, but the previous configuration will still be returned in calls to ```Optional<T> get()```. This is by design as we wish to avoid impacting a running service due to a configuration change error.
 
 ## Watchconf-util
 
