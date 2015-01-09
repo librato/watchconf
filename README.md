@@ -20,7 +20,7 @@ To use this extension on Maven-based projects, use following dependency:
 Getting Started
 =========
 
-The primary interface for wathconf is ```java DynamicConfig<T>```
+The primary interface for wathconf is ```DynamicConfig<T>```
 
 ```java
 public interface DynamicConfig<T> {
@@ -36,9 +36,22 @@ public interface DynamicConfig<T> {
 }
 ```
 
-There are abstract adapter implementations for each source supported by watchconf, to create your DynamicConfig object simply extend the appropriate adapter, select your converter type and instantiate.
+# Adapters
+
+Watchconf provides abstract adapter implementations for each source supported by watchconf, to create your DynamicConfig object simply extend the appropriate adapter, select your converter type and instantiate.
 
 * [Zookeeper](https://github.com/librato/watchconf/blob/master/watchconf-api/src/main/java/com/librato/watchconf/adapter/zookeeper/DynamicConfigZKAdapter.java)
 * [Redis](https://github.com/librato/watchconf/blob/master/watchconf-api/src/main/java/com/librato/watchconf/adapter/redis/DynamicConfigRedisAdapter.java)
 * [File](https://github.com/librato/watchconf/blob/master/watchconf-api/src/main/java/com/librato/watchconf/adapter/file/DynamicConfigFileAdapter.java)
 
+# Converters
+
+Adapters use the ```Converter``` interface to convert serialized configuration into objects. Watchconf provides converter for various data formats including JSON and YAML. If you need to support another format simply implement a converter.
+
+```java
+public interface Converter<T, V> {
+
+    T toDomain(V v, Class<T> clazz) throws Exception;
+    V fromDomain(T t) throws Exception;
+}
+```
