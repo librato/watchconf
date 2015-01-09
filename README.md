@@ -45,7 +45,7 @@ Watchconf provides abstract adapter implementations for each source supported by
 
 ### Converters
 
-Adapters use the ```Converter``` interface to convert serialized configuration into objects. Watchconf provides converter for various data formats including JSON and YAML. If you need to support another format simply implement a converter.
+Adapters use the ```Converter``` interface to convert serialized configuration into objects. Watchconf provides converter for various data formats including [JSON](https://github.com/librato/watchconf/blob/master/watchconf-api/src/main/java/com/librato/watchconf/converter/JsonConverter.java) and [YAML](https://github.com/librato/watchconf/blob/master/watchconf-api/src/main/java/com/librato/watchconf/converter/YAMLConverter.java). If you need to support another format simply implement a converter.
 
 ```java
 public interface Converter<T, V> {
