@@ -18,12 +18,12 @@ import java.util.concurrent.TimeUnit;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 
-public class RedisAdapterIT {
+public class DynamicConfigRedisAdapterIT {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
 
-    public static class ExampleConfigAdapter extends RedisAdapter<ExampleConfig> {
+    public static class ExampleConfigAdapter extends DynamicConfigRedisAdapter<ExampleConfig> {
 
         public ExampleConfigAdapter(JedisPool jedis, ChangeListener<ExampleConfig> changeListener) throws Exception {
             super("config", jedis, new JsonConverter<ExampleConfig>(), changeListener);

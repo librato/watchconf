@@ -3,7 +3,7 @@ package com.librato.watconf.adapter.file;
 import com.google.common.base.Optional;
 import com.librato.ExampleConfig;
 import com.librato.watchconf.DynamicConfig;
-import com.librato.watchconf.adapter.file.FileAdapter;
+import com.librato.watchconf.adapter.file.DynamicConfigFileAdapter;
 import com.librato.watchconf.converter.Converter;
 import com.librato.watchconf.converter.YAMLConverter;
 import org.junit.Test;
@@ -17,9 +17,9 @@ import java.util.concurrent.TimeUnit;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 
-public class FileAdapterTest {
+public class DynamicConfigFileAdapterTest {
 
-    public static class ExampleConfigAdapter extends FileAdapter<ExampleConfig> {
+    public static class ExampleConfigAdapter extends DynamicConfigFileAdapter<ExampleConfig> {
         public ExampleConfigAdapter(String path, Converter<ExampleConfig, byte[]> converter) throws IOException, InterruptedException {
             super(path, converter);
         }

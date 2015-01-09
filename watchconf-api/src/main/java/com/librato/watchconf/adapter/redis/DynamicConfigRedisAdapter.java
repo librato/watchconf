@@ -12,18 +12,18 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class RedisAdapter<T> extends AbstractConfigAdapter<T, byte[]> {
+public class DynamicConfigRedisAdapter<T> extends AbstractConfigAdapter<T, byte[]> {
 
-    private final Logger log = Logger.getLogger(RedisAdapter.class);
+    private final Logger log = Logger.getLogger(DynamicConfigRedisAdapter.class);
     private final JedisPool jedisPool;
     private final ExecutorService redisExecutor = Executors.newSingleThreadExecutor();
     private final String path;
 
-    public RedisAdapter(String path, JedisPool jedisPool, Converter<T, byte[]> converter) throws Exception {
+    public DynamicConfigRedisAdapter(String path, JedisPool jedisPool, Converter<T, byte[]> converter) throws Exception {
         this(path, jedisPool, converter, null);
     }
 
-    public RedisAdapter(final String path, final JedisPool jedisPool, Converter<T, byte[]> converter, ChangeListener<T> changeListener) throws Exception {
+    public DynamicConfigRedisAdapter(final String path, final JedisPool jedisPool, Converter<T, byte[]> converter, ChangeListener<T> changeListener) throws Exception {
         super(converter, Optional.fromNullable(changeListener));
         Preconditions.checkArgument(path != null && !path.isEmpty(), "path cannot be null or blank");
         this.jedisPool = jedisPool;

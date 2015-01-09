@@ -7,15 +7,13 @@ import com.librato.watchconf.converter.Converter;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.NodeCache;
 import org.apache.curator.framework.recipes.cache.NodeCacheListener;
-import org.apache.log4j.Logger;
 
-public abstract class ZKAdapter<T> extends AbstractConfigAdapter<T, byte[]> {
+public class DynamicConfigZKAdapter<T> extends AbstractConfigAdapter<T, byte[]> {
 
-    private static final Logger log = Logger.getLogger(ZKAdapter.class);
     private final NodeCacheListener nodeCacheListener;
     private final NodeCache nodeCache;
 
-    public ZKAdapter(final String path, final CuratorFramework curatorFramework, Converter<T, byte[]> converter, ChangeListener<T> changeListener) throws Exception {
+    public DynamicConfigZKAdapter(final String path, final CuratorFramework curatorFramework, Converter<T, byte[]> converter, ChangeListener<T> changeListener) throws Exception {
         super(converter, Optional.fromNullable(changeListener));
         Preconditions.checkArgument(path != null && !path.isEmpty(), "path cannot be null or blank");
         Preconditions.checkNotNull(curatorFramework, "CuratorFramework cannot be null");
@@ -39,7 +37,7 @@ public abstract class ZKAdapter<T> extends AbstractConfigAdapter<T, byte[]> {
         this.nodeCache.start(true);
     }
 
-    public ZKAdapter(String path, CuratorFramework curatorFramework, Converter converter) throws Exception {
+    public DynamicConfigZKAdapter(String path, CuratorFramework curatorFramework, Converter converter) throws Exception {
         this(path, curatorFramework, converter, null);
     }
 }

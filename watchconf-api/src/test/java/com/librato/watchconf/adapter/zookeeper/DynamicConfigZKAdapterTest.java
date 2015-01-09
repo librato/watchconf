@@ -21,7 +21,7 @@ import static org.mockito.Mockito.when;
 
 public class DynamicConfigZKAdapterTest {
 
-    private class ExampleConfigAdapter extends ZKAdapter<ExampleConfig> {
+    private class ExampleConfigAdapter extends DynamicConfigZKAdapter<ExampleConfig> {
 
         public ExampleConfigAdapter(CuratorFramework curatorFramework) throws Exception {
             super("/test/config", curatorFramework, new JsonConverter<ExampleConfig>());

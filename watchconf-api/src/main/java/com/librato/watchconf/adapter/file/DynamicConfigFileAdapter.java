@@ -14,13 +14,13 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class FileAdapter<T> extends AbstractConfigAdapter<T, byte[]> {
+public class DynamicConfigFileAdapter<T> extends AbstractConfigAdapter<T, byte[]> {
 
-    private static final Logger log = Logger.getLogger(FileAdapter.class);
+    private static final Logger log = Logger.getLogger(DynamicConfigFileAdapter.class);
     private final File file;
     private final Executor fileWatchExecutor = Executors.newSingleThreadExecutor();
 
-    public FileAdapter(String path, Converter<T, byte[]> converter, ChangeListener<T> changeListener) throws IOException, InterruptedException {
+    public DynamicConfigFileAdapter(String path, Converter<T, byte[]> converter, ChangeListener<T> changeListener) throws IOException, InterruptedException {
         super(converter, Optional.fromNullable(changeListener));
         Preconditions.checkArgument(path != null && !path.isEmpty(), "path cannot be null or blank");
         Preconditions.checkArgument(converter != null, "converter cannot be null");
@@ -35,7 +35,7 @@ public class FileAdapter<T> extends AbstractConfigAdapter<T, byte[]> {
         fileWatchExecutor.execute(fileWatcher);
     }
 
-    public FileAdapter(String path, Converter<T, byte[]> converter) throws IOException, InterruptedException {
+    public DynamicConfigFileAdapter(String path, Converter<T, byte[]> converter) throws IOException, InterruptedException {
         this(path, converter, null);
     }
 
@@ -71,13 +71,13 @@ public class FileAdapter<T> extends AbstractConfigAdapter<T, byte[]> {
     private static class WatchQueueReader implements Runnable {
 
         private final String fileName;
-        private final FileAdapter adapter;
+        private final DynamicConfigFileAdapter adapter;
         /**
          * the watchService that is passed in from above
          */
         private WatchService watcher;
 
-        public WatchQueueReader(WatchService watcher, String fileName, FileAdapter adapter) {
+        public WatchQueueReader(WatchService watcher, String fileName, DynamicConfigFileAdapter adapter) {
             this.watcher = watcher;
             this.fileName = fileName;
             this.adapter = adapter;

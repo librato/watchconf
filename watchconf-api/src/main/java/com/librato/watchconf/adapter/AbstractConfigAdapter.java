@@ -56,9 +56,7 @@ public class AbstractConfigAdapter<T, V> implements DynamicConfig<T> {
         }
     }
 
-
     private Class<T> getClassForType() {
-        return (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass())
-                .getActualTypeArguments()[0];
+        return (Class<T>)  (((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments())[0];
     }
 }

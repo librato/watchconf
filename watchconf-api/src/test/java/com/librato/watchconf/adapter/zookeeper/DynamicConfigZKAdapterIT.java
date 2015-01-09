@@ -24,7 +24,7 @@ public class DynamicConfigZKAdapterIT {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    private class ExampleConfigAdapter extends ZKAdapter<ExampleConfig> {
+    private class ExampleConfigAdapter extends DynamicConfigZKAdapter<ExampleConfig> {
 
         public ExampleConfigAdapter(CuratorFramework curatorFramework) throws Exception {
             super("/watchconf/test/config", curatorFramework, new JsonConverter<ExampleConfig>());
