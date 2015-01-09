@@ -60,13 +60,18 @@ public class DynamicConfigRedisAdapterIT {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
         new ExampleConfigAdapter(pool, new DynamicConfig.ChangeListener<ExampleConfig>() {
             @Override
-            public void changed(Optional<ExampleConfig> t) {
+            public void onChange(Optional<ExampleConfig> t) {
                 assertTrue(t.isPresent());
                 assertEquals(2, t.get().id);
                 assertEquals("ray", t.get().name);
                 assertEquals(1, t.get().things.size());
                 assertEquals("thing2", t.get().things.get(0).name);
                 countDownLatch.countDown();
+            }
+
+            @Override
+            public void onError(Exception ex) {
+
             }
         });
 

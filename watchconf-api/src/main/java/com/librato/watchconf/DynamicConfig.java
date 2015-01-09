@@ -16,7 +16,8 @@ public interface DynamicConfig<T> {
      * @param <T> The type of configuration referred to by this ChangeListener
      */
     public interface ChangeListener<T> {
-        public void changed(Optional<T> t);
+        public void onChange(Optional<T> t);
+        public void onError(Exception ex);
     }
 
     /**

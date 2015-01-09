@@ -39,6 +39,7 @@ public abstract class AbstractConfigAdapter<T, V> implements DynamicConfig<T> {
             config.set(Optional.of(converter.toDomain(v, clazz)));
         } catch (Exception ex) {
             log.error("unable to parse config", ex);
+            notifyListenersOnError(ex);
         }
     }
 
@@ -52,9 +53,16 @@ public abstract class AbstractConfigAdapter<T, V> implements DynamicConfig<T> {
 
     protected void notifyListeners() {
         for (ChangeListener changeListener : changeListenerList) {
-            changeListener.changed(config.get());
+            changeListener.onChange(config.get());
         }
     }
+
+    protected void notifyListenersOnError(Exception ex) {
+        for (ChangeListener changeListener : changeListenerList) {
+            changeListener.onError(ex);
+        }
+    }
+
 
     private Class<T> getClassForType() {
         return (Class<T>) (((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments())[0];

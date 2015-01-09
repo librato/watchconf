@@ -25,7 +25,8 @@ The primary interface for wathconf is ```DynamicConfig<T>```
 public interface DynamicConfig<T> {
     
     public interface ChangeListener<T> {
-        public void changed(Optional<T> t);
+        public void onChange(Optional<T> t);
+        public void onError(Exception ex);
     }
 
     Optional<T> get() throws Exception;
@@ -60,7 +61,8 @@ public interface Converter<T, V> {
 
 ```java
 public interface ChangeListener<T> {
-  public void changed(Optional<T> t);
+  public void onChange(Optional<T> t);
+  public void onError(Exception ex);
 }
 ```
 
@@ -94,7 +96,7 @@ In order to watch our ```WebServiceConfig``` we first need a ```CuratorFramework
       super("/services/webservice/config", curatorFramework, new JsonConverter<WebServiceConfig>());
     }
     
-    public void changed(Optional<WebServiceConfig> config) {
+    public void onChange(Optional<WebServiceConfig> config) {
       doSomething(config);
     }
  }
@@ -111,7 +113,7 @@ In order to watch our ```WebServiceConfig``` we first need a ```CuratorFramework
 
 # Operational Concerns
 
-Upon initial instantiatation of an adapter if there are errors parsing a configuration or if the resource is non-existant the ```Optional<T> get()``` method of ```DynamicConfig``` will return a ```Optional.absent()```. If during operation configuration changes are made and errors are encountered parsing the updated configuration a log message will be written ```log.error("unable to parse config", ex);``` but the previous configuration will still be present in calls to ```Optional<T> get()```. This is by design as we wish to avoid impacting a running service due to a configuration change error.
+Upon initial instantiatation of an adapter if there are errors parsing a configuration or if the resource is non-existant the ```Optional<T> get()``` method of ```DynamicConfig``` will return a ```Optional.absent()```. If during operation configuration changes are made and errors are encountered parsing the updated configuration a log message will be written ```log.error("unable to parse config", ex);``` and any ChangeListeners will be notified, but the previous configuration will still be present in calls to ```Optional<T> get()```. This is by design as we wish to avoid impacting a running service due to a configuration change error.
 
 ## Watchconf-util
 
