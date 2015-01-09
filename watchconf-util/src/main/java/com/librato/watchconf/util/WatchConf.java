@@ -92,7 +92,7 @@ public class WatchConf {
 
     private static void printHelp() {
         System.out.println("watchconf: Must specify -zkServer <host:port> and additional required flags");
-        System.out.println("-format [yaml|json]: input file format")
+        System.out.println("-format [yaml|json]: input file format");
         System.out.println("-f <file>: input file to read from");
         System.out.println("-o [yaml|json]: format of data to output to znode");
         System.out.println("-z: full path to znode to update, will create parents and node doesn't exist");
