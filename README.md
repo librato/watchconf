@@ -93,7 +93,7 @@ In order to watch our ```WebServiceConfig``` we first need a ```CuratorFramework
    implements  ChangeListener<WebServiceConfig> {
     
     public ExampleConfigAdapter(CuratorFramework curatorFramework) throws Exception {
-      super("/services/webservice/config", curatorFramework, new JsonConverter<ExampleConfig>());
+      super("/services/webservice/config", curatorFramework, new JsonConverter<WebServiceConfig>());
     }
     
     public void changed(Optional<WebServiceConfig> config) {
