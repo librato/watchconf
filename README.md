@@ -17,8 +17,7 @@ To use this extension on Maven-based projects, use following dependency:
 </dependency>
 ```
 
-Getting Started
-=========
+## Getting Started
 
 The primary interface for wathconf is ```DynamicConfig<T>```
 
@@ -36,7 +35,7 @@ public interface DynamicConfig<T> {
 }
 ```
 
-# Adapters
+### Adapters
 
 Watchconf provides abstract adapter implementations for each source supported by watchconf, to create your DynamicConfig object simply extend the appropriate adapter, select your converter type and instantiate.
 
@@ -44,7 +43,7 @@ Watchconf provides abstract adapter implementations for each source supported by
 * [Redis](https://github.com/librato/watchconf/blob/master/watchconf-api/src/main/java/com/librato/watchconf/adapter/redis/DynamicConfigRedisAdapter.java)
 * [File](https://github.com/librato/watchconf/blob/master/watchconf-api/src/main/java/com/librato/watchconf/adapter/file/DynamicConfigFileAdapter.java)
 
-# Converters
+### Converters
 
 Adapters use the ```Converter``` interface to convert serialized configuration into objects. Watchconf provides converter for various data formats including JSON and YAML. If you need to support another format simply implement a converter.
 
@@ -54,4 +53,58 @@ public interface Converter<T, V> {
     T toDomain(V v, Class<T> clazz) throws Exception;
     V fromDomain(T t) throws Exception;
 }
+```
+
+### ChangeListener
+
+```DynamicConfig``` allows you to register a ```ChangeListener``` to be notified when your configuration changes, if you prefer not to be notified and would rather poll you can use the ```Optional<T> get()``` method.
+
+```java
+public interface ChangeListener<T> {
+  public void changed(Optional<T> t);
+}
+```
+
+# Example Usage
+
+At Librato we're using [Zookeeper](http://zookeeper.apache.org/) to store configuration that we want to update on the fly and have watchconf notify our service, let's say we have a clustered service named ```WebService``` and we're storing our configuration in JSON in a znode named /services/webservice/config. First we need to create a POJO representation of our config, we'll call it ```WebServiceConfig```
+
+```java
+public class WebServiceConfig {
+  
+  public int version;
+  public String someUrl;
+  
+  public KafkaConfig kafkaConfig;
+  
+  public static class KafkaConfig {
+    
+    public int queueTimeMs;
+    public int batchSize;
+  }
+}
+```
+
+In order to watch our ```WebServiceConfig``` we first need a ```CuratorFramework``` instance and then we extend the Zookeeper adapter and use the JsonConverter.
+
+```java
+
+ public static class WebServiceAdapter extends DynamicConfigZKAdapter<WebServiceConfig> implements  ChangeListener<WebServiceConfig> {
+    public ExampleConfigAdapter(CuratorFramework curatorFramework) throws Exception {
+      super("/services/webservice/config", curatorFramework, new JsonConverter<ExampleConfig>());
+    }
+    
+    public void changed(Optional<WebServiceConfig> config) {
+      doSomething(config);
+    }
+ }
+
+ CuratorFramework framework = CuratorFrameworkFactory.builder()
+                .connectionTimeoutMs(1000)
+                .connectString("localhost:2181")
+                .retryPolicy(new ExponentialBackoffRetry(1000, 5))
+                .build();
+        framework.start();
+  
+ DynamicConfig<WebServiceConfig> config = new WebServiceAdapter(framwork);
 ```
