@@ -14,7 +14,7 @@ import java.io.IOException;
 public class WatchConf {
 
     public static void main(String[] args) throws Exception {
-        if (args.length < 8) {
+        if (args.length < 10) {
             printHelp();
             return;
         }
@@ -23,26 +23,28 @@ public class WatchConf {
     }
 
     private static void pushConfig(String[] args) throws Exception {
-        String formatFlag = args[0];
-        String fileFlag = args[2];
-        String outputFlag = args[4];
-        String znodeFlag = args[6];
+        String zkConnectFlag = args[0];
+        String formatFlag = args[2];
+        String fileFlag = args[4];
+        String outputFlag = args[6];
+        String znodeFlag = args[8];
 
-        if (!"-format".equals(formatFlag) || !"-f".equals(fileFlag) || !"-o".equals(outputFlag) || !"-z".equals(znodeFlag)) {
+        if (!"-zkServer".equals(zkConnectFlag) || !"-format".equals(formatFlag) || !"-f".equals(fileFlag) || !"-o".equals(outputFlag) || !"-z".equals(znodeFlag)) {
             printHelp();
             return;
         }
 
-        String format = args[1];
-        String fileName = args[3];
-        String output = args[5];
-        String path = args[7];
+        String zkServer = args[1];
+        String format = args[3];
+        String fileName = args[5];
+        String output = args[7];
+        String path = args[9];
 
         JsonNode jsonNode = getJsonNode(new File(fileName), format);
 
         CuratorFramework framework = CuratorFrameworkFactory.builder()
                 .connectionTimeoutMs(1000)
-                .connectString("localhost:2181")
+                .connectString(zkServer)
                 .retryPolicy(new ExponentialBackoffRetry(1000, 5))
                 .build();
         framework.start();
@@ -89,7 +91,8 @@ public class WatchConf {
     }
 
     private static void printHelp() {
-        System.out.println("watchconf: Must specify -format [yaml|json] and additional required flags");
+        System.out.println("watchconf: Must specify -zkServer <host:port> and additional required flags");
+        System.out.println("-format [yaml|json]: input file format")
         System.out.println("-f <file>: input file to read from");
         System.out.println("-o [yaml|json]: format of data to output to znode");
         System.out.println("-z: full path to znode to update, will create parents and node doesn't exist");
