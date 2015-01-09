@@ -22,7 +22,7 @@
         <url>https://github.com/librato/watchconf/</url>
         <connection>scm:git:git://github.com/librato/watchconf</connection>
         <developerConnection>scm:git:git@github.com:librato/watchconf</developerConnection>
-        <tag>watchconf-0.0.5</tag>
+        <tag>HEAD</tag>
     </scm>
     <build>
         <plugins>
