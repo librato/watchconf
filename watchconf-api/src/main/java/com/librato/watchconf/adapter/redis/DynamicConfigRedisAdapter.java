@@ -12,7 +12,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class DynamicConfigRedisAdapter<T> extends AbstractConfigAdapter<T, byte[]> {
+public abstract class DynamicConfigRedisAdapter<T> extends AbstractConfigAdapter<T, byte[]> {
 
     private final Logger log = Logger.getLogger(DynamicConfigRedisAdapter.class);
     private final JedisPool jedisPool;
@@ -76,7 +76,7 @@ public class DynamicConfigRedisAdapter<T> extends AbstractConfigAdapter<T, byte[
         });
     }
 
-    public void shutdown() throws InterruptedException {
+    public void shutdown() throws Exception {
         redisExecutor.shutdown();
         log.info("Waiting for redisExecutor to stop in 10s");
         if (!redisExecutor.awaitTermination(10, TimeUnit.SECONDS)) {

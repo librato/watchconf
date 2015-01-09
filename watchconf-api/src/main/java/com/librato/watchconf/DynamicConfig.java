@@ -41,4 +41,9 @@ public interface DynamicConfig<T> {
      * @param changeListener {@link com.librato.watchconf.DynamicConfig.ChangeListener} to remove.
      */
     void removeListener(ChangeListener changeListener);
+
+    /**
+     * Shutdown a dynamic configuration
+     */
+    void shutdown() throws Exception;
 }

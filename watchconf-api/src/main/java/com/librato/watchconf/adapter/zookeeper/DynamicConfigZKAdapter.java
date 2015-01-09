@@ -8,10 +8,10 @@ import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.NodeCache;
 import org.apache.curator.framework.recipes.cache.NodeCacheListener;
 
-public class DynamicConfigZKAdapter<T> extends AbstractConfigAdapter<T, byte[]> {
+public abstract class DynamicConfigZKAdapter<T> extends AbstractConfigAdapter<T, byte[]> {
 
-    private final NodeCacheListener nodeCacheListener;
-    private final NodeCache nodeCache;
+    private NodeCacheListener nodeCacheListener;
+    private NodeCache nodeCache;
 
     public DynamicConfigZKAdapter(final String path, final CuratorFramework curatorFramework, Converter<T, byte[]> converter, ChangeListener<T> changeListener) throws Exception {
         super(converter, Optional.fromNullable(changeListener));

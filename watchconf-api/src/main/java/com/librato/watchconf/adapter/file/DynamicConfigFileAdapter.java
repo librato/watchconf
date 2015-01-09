@@ -14,7 +14,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class DynamicConfigFileAdapter<T> extends AbstractConfigAdapter<T, byte[]> {
+public abstract class DynamicConfigFileAdapter<T> extends AbstractConfigAdapter<T, byte[]> {
 
     private static final Logger log = Logger.getLogger(DynamicConfigFileAdapter.class);
     private final File file;

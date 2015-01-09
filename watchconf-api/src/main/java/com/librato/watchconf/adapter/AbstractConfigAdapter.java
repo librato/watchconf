@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class AbstractConfigAdapter<T, V> implements DynamicConfig<T> {
+public abstract class AbstractConfigAdapter<T, V> implements DynamicConfig<T> {
 
     private static final Logger log = LoggerFactory.getLogger(AbstractConfigAdapter.class);
     protected final Class<T> clazz;
@@ -57,6 +57,11 @@ public class AbstractConfigAdapter<T, V> implements DynamicConfig<T> {
     }
 
     private Class<T> getClassForType() {
-        return (Class<T>)  (((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments())[0];
+        return (Class<T>) (((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments())[0];
+    }
+
+    @Override
+    public void shutdown() throws Exception {
+        // NO-OP
     }
 }
