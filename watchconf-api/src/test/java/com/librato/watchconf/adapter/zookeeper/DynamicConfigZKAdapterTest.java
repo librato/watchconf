@@ -6,6 +6,7 @@ import com.librato.watchconf.converter.JsonConverter;
 import org.apache.curator.CuratorZookeeperClient;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.api.*;
+import org.apache.curator.framework.imps.CuratorFrameworkState;
 import org.apache.curator.framework.listen.Listenable;
 import org.apache.curator.utils.EnsurePath;
 import org.apache.zookeeper.data.Stat;
@@ -36,6 +37,7 @@ public class DynamicConfigZKAdapterTest {
         WatchPathable watchPathable = mock(WatchPathable.class);
         when(curatorFramework.getZookeeperClient()).thenReturn(mock(CuratorZookeeperClient.class));
         when(curatorFramework.getData()).thenReturn(getDataBuilder);
+        when(curatorFramework.getState()).thenReturn(CuratorFrameworkState.STARTED);
         when(getDataBuilder.storingStatIn(any(Stat.class))).thenReturn(watchPathable);
         when(watchPathable.forPath(anyString())).thenReturn(new byte[0]);
         when(getDataBuilder.forPath(anyString())).thenReturn(null);
@@ -64,6 +66,7 @@ public class DynamicConfigZKAdapterTest {
         WatchPathable watchPathable = mock(WatchPathable.class);
         when(curatorFramework.getZookeeperClient()).thenReturn(mock(CuratorZookeeperClient.class));
         when(curatorFramework.getData()).thenReturn(getDataBuilder);
+        when(curatorFramework.getState()).thenReturn(CuratorFrameworkState.STARTED);
         when(getDataBuilder.storingStatIn(any(Stat.class))).thenReturn(watchPathable);
         when(watchPathable.forPath(anyString())).thenReturn(objectMapper.writeValueAsBytes(exampleConfig));
         when(getDataBuilder.forPath(anyString())).thenReturn(objectMapper.writeValueAsBytes(exampleConfig));
