@@ -5,7 +5,7 @@
     <groupId>com.librato.watchconf</groupId>
     <artifactId>watchconf</artifactId>
     <packaging>pom</packaging>
-    <version>0.0.7-SNAPSHOT</version>
+    <version>0.0.7</version>
     <modules>
         <module>watchconf-api</module>
         <module>watchconf-util</module>
@@ -22,7 +22,7 @@
         <url>https://github.com/librato/watchconf/</url>
         <connection>scm:git:git://github.com/librato/watchconf</connection>
         <developerConnection>scm:git:git@github.com:librato/watchconf</developerConnection>
-        <tag>HEAD</tag>
+        <tag>watchconf-0.0.7</tag>
     </scm>
     <build>
         <plugins>
