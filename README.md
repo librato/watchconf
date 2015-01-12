@@ -1,9 +1,9 @@
 Overview
 =========
 
-Most of the time if you need to make a configuration change to a service you can modify a file, deploy and perform a rolling restart across the cluster. But sometimes you would rather not restart, watchconf aims to address those instances.
+Most of the time if you need to make a configuration change to a service you can modify a file, deploy, and perform a rolling restart across the cluster. But sometimes you would rather not restart. Watchconf aims to address these occasions.
 
-Watchconf provides a simple read-only interface and several adapters for monitoring data from various sources, so when configuration changes you're notified.
+Watchconf provides a simple read-only interface and several adapters for monitoring data from various sources, so that you're notified when configurations change.
 
 ## Maven dependency
 
@@ -19,7 +19,7 @@ To use this extension on Maven-based projects, use following dependency:
 
 ## Getting Started
 
-The primary interface for wathconf is ```DynamicConfig<T>```
+The primary interface for wathconf is ```DynamicConfig<T>```:
 
 ```java
 public interface DynamicConfig<T> {
@@ -38,7 +38,7 @@ public interface DynamicConfig<T> {
 
 ### Adapters
 
-Watchconf provides abstract adapter implementations for each source supported by watchconf, to create your DynamicConfig object simply extend the appropriate adapter, select your converter type and instantiate.
+Watchconf provides abstract adapter implementations for each source supported by watchconf. To create your ```DynamicConfig``` object simply extend the appropriate adapter, select your converter type, and instantiate.
 
 * [Zookeeper](https://github.com/librato/watchconf/blob/master/watchconf-api/src/main/java/com/librato/watchconf/adapter/zookeeper/DynamicConfigZKAdapter.java)
 * [Redis](https://github.com/librato/watchconf/blob/master/watchconf-api/src/main/java/com/librato/watchconf/adapter/redis/DynamicConfigRedisAdapter.java)
@@ -57,7 +57,7 @@ public interface Converter<T, V> {
 
 ### ChangeListener
 
-```DynamicConfig``` allows you to register a ```ChangeListener``` to be notified when your configuration changes, if you prefer not to be notified and would rather poll you can use the ```Optional<T> get()``` method.
+```DynamicConfig``` allows you to register a ```ChangeListener``` to be notified when your configuration changes. If you prefer not to be notified and would rather poll you can use the ```Optional<T> get()``` method.
 
 ```java
 public interface ChangeListener<T> {
@@ -68,7 +68,7 @@ public interface ChangeListener<T> {
 
 # Example Usage
 
-At Librato we're using [Zookeeper](http://zookeeper.apache.org/) to store configuration that we want to update on the fly and have watchconf notify our service, let's say we have a clustered service named ```WebService``` and we're storing our configuration in JSON in a znode named /services/webservice/config. First we need to create a POJO representation of our config, we'll call it ```WebServiceConfig```
+At Librato we're using [Zookeeper](http://zookeeper.apache.org/) to store configuration that we want to update on the fly and have watchconf notify our service. Say we have a clustered service named ```WebService``` and we're storing our configuration in JSON in a znode named `/services/webservice/config`. First we need to create a POJO representation of our config, in this case we have one named ```WebServiceConfig```.
 
 ```java
 public class WebServiceConfig {
@@ -86,7 +86,7 @@ public class WebServiceConfig {
 }
 ```
 
-In order to watch our ```WebServiceConfig``` we first need a ```CuratorFramework``` instance and then we extend the Zookeeper adapter and use the JsonConverter.
+In order to watch our ```WebServiceConfig``` we first need a ```CuratorFramework``` instance. We then extend the Zookeeper adapter and use the ```JsonConverter```.
 
 ```java
  public static class WebServiceAdapter extends DynamicConfigZKAdapter<WebServiceConfig> 
@@ -113,11 +113,11 @@ In order to watch our ```WebServiceConfig``` we first need a ```CuratorFramework
 
 # Testing
 
-Unit tests can be run with ```mvn test```. In addition there are integration tests (testing ending in *IT.java). Those may be run with ```mvn clean; mvn verify```, though you need to have both Zookeeper and Redis installed.
+Unit tests can be run with ```mvn test```. In addition there are integration tests (ending in *IT.java). Those may be run with ```mvn clean; mvn verify```, though you need to have both Zookeeper and Redis installed.
 
 # Operational Concerns
 
-Upon initial instantiatation of an adapter if there are errors parsing a configuration or if the resource is non-existant the ```Optional<T> get()``` method of ```DynamicConfig``` will return a ```Optional.absent()```. If during operation configuration changes are made and errors are encountered parsing the updated configuration a log message will be written ```log.error("unable to parse config", ex);``` and any ChangeListeners will be notified, but the previous configuration will still be returned in calls to ```Optional<T> get()```. This is by design as we wish to avoid impacting a running service due to a configuration change error.
+Upon initial instantiatation of an adapter, if there are errors parsing a configuration or if the resource is non-existant, the ```Optional<T> get()``` method of ```DynamicConfig``` will return a ```Optional.absent()```. If during operation configuration changes are made and errors are encountered, parsing the updated configuration a log message will be written ```log.error("unable to parse config", ex);``` and any ChangeListeners will be notified, but the previous configuration will still be returned in calls to ```Optional<T> get()```. This is by design as we wish to avoid impacting a running service due to a configuration change error.
 
 ## Watchconf-util
 
@@ -125,7 +125,7 @@ The watchconf-util package comes with a utility for parsing and pushing configur
 
 ```java -jar ./target/watchconf-util-0.0.7-SNAPSHOT.jar```
 
-You will be prompted to supply arguments for 5 flags
+You will be prompted to supply arguments for 5 flags.
 
 ```
 watchconf: Must specify -zkServer <host:port> and additional required flags
