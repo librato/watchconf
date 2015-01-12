@@ -13,7 +13,7 @@ To use this extension on Maven-based projects, use following dependency:
 <dependency>
   <groupId>com.librato.watchconf</groupId>
   <artifactId>watchconf-api</artifactId>
-  <version>0.0.5</version>
+  <version>0.0.7</version>
 </dependency>
 ```
 
@@ -111,6 +111,10 @@ In order to watch our ```WebServiceConfig``` we first need a ```CuratorFramework
  DynamicConfig<WebServiceConfig> config = new WebServiceAdapter(framwork);
 ```
 
+# Testing
+
+Unit tests can be run with ```mvn test```. In addition there are integration tests (testing ending in *IT.java). Those may be run with ```mvn clean; mvn verify```, though you need to have both Zookeeper and Redis installed.
+
 # Operational Concerns
 
 Upon initial instantiatation of an adapter if there are errors parsing a configuration or if the resource is non-existant the ```Optional<T> get()``` method of ```DynamicConfig``` will return a ```Optional.absent()```. If during operation configuration changes are made and errors are encountered parsing the updated configuration a log message will be written ```log.error("unable to parse config", ex);``` and any ChangeListeners will be notified, but the previous configuration will still be returned in calls to ```Optional<T> get()```. This is by design as we wish to avoid impacting a running service due to a configuration change error.
@@ -119,12 +123,13 @@ Upon initial instantiatation of an adapter if there are errors parsing a configu
 
 The watchconf-util package comes with a utility for parsing and pushing configuration into zookeeper. At librato we keep configuration in YAML stored in a repo. If I want to push changes to a cluster I would update the YAML, push to our repo and deploy to Zookeeper. To run the configuration push utility enter
 
-```java -jar ./target/watchconf-util-0.0.5-SNAPSHOT.jar```
+```java -jar ./target/watchconf-util-0.0.7-SNAPSHOT.jar```
 
-You will be prompted to supply arguments for 4 flags
+You will be prompted to supply arguments for 5 flags
 
 ```
-watchconf: Must specify -format [yaml|json] and additional required flags
+watchconf: Must specify -zkServer <host:port> and additional required flags
+-format [yaml|json]: input file format
 -f <file>: input file to read from
 -o [yaml|json]: format of data to output to znode
 -z: full path to znode to update, will create parents and node doesn't exist
