@@ -119,6 +119,29 @@ Unit tests can be run with ```mvn test```. In addition there are integration tes
 
 Upon initial instantiatation of an adapter, if there are errors parsing a configuration or if the resource is non-existant, the ```Optional<T> get()``` method of ```DynamicConfig``` will return a ```Optional.absent()```. If during operation configuration changes are made and errors are encountered, parsing the updated configuration a log message will be written ```log.error("unable to parse config", ex);``` and any ChangeListeners will be notified, but the previous configuration will still be returned in calls to ```Optional<T> get()```. This is by design as we wish to avoid impacting a running service due to a configuration change error.
 
+## F.A.Q.
+
+* What happens if I push a bad configuation that causes an error during parse? Will it break my service?
+
+  No, If you push a bad configuration (unparsable) you will most likely see jackson parsing exceptions but your service will continue to run using the last known good configuration. 
+  
+  ```
+  java.lang.RuntimeException: java.lang.RuntimeException: com.fasterxml.jackson.core.JsonParseException: Unexpected character ('.' (code 46)): Expected space separating root-level values
+```
+
+ Simply push a new configuration with watchconf to resolve the problem. You should also see log messages from the watchconf AbstractConfigAdapter and calls to onError in the watchconf adapter in amnis.
+ 
+ * ```2015-01-16 19:42:28 c.l.w.a.AbstractConfigAdapter [ERROR] unable to parse config```
+ * ```c.l.a.KafkaJsonWriterBolt$1.onError(KafkaJsonWriterBolt.java:79) ~[stormjar.jar:na]```
+
+* What happens if I accidentally delete a the znode for a config?
+
+  Nothing, your services will continue to run fine, just push a new configuration and they will pick up the changes.
+  
+* What happens if the zookeeper connection fails?
+
+  Your services will continue to run on zookeeper connection failure, they will use the last known good configuration. You will see curator and zookeeper connection errors in the log. Once connectivity is restored the error messages will subside.
+
 ## Watchconf-util
 
 The watchconf-util package comes with a utility for parsing and pushing configuration into zookeeper. At librato we keep configuration in YAML stored in a repo. If I want to push changes to a cluster I would update the YAML, push to our repo and deploy to Zookeeper. To run the configuration push utility enter
