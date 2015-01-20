@@ -40,7 +40,7 @@ public interface DynamicConfig<T> {
 
 Watchconf provides abstract adapter implementations for each source supported by watchconf. To create your ```DynamicConfig``` object simply extend the appropriate adapter, select your converter type, and instantiate.
 
-* [Zookeeper](https://github.com/librato/watchconf/blob/master/watchconf-api/src/main/java/com/librato/watchconf/adapter/zookeeper/DynamicConfigZKAdapter.java) - Used in production at Librato
+* [Zookeeper](https://github.com/librato/watchconf/blob/master/watchconf-api/src/main/java/com/librato/watchconf/adapter/zookeeper/DynamicConfigZKAdapter.java) - used in production at Librato
 * [Redis](https://github.com/librato/watchconf/blob/master/watchconf-api/src/main/java/com/librato/watchconf/adapter/redis/DynamicConfigRedisAdapter.java)
 * [File](https://github.com/librato/watchconf/blob/master/watchconf-api/src/main/java/com/librato/watchconf/adapter/file/DynamicConfigFileAdapter.java)
 
