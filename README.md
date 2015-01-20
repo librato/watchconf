@@ -40,7 +40,7 @@ public interface DynamicConfig<T> {
 
 Watchconf provides abstract adapter implementations for each source supported by watchconf. To create your ```DynamicConfig``` object simply extend the appropriate adapter, select your converter type, and instantiate.
 
-* [Zookeeper](https://github.com/librato/watchconf/blob/master/watchconf-api/src/main/java/com/librato/watchconf/adapter/zookeeper/DynamicConfigZKAdapter.java)
+* [Zookeeper](https://github.com/librato/watchconf/blob/master/watchconf-api/src/main/java/com/librato/watchconf/adapter/zookeeper/DynamicConfigZKAdapter.java) - Used in production at Librato
 * [Redis](https://github.com/librato/watchconf/blob/master/watchconf-api/src/main/java/com/librato/watchconf/adapter/redis/DynamicConfigRedisAdapter.java)
 * [File](https://github.com/librato/watchconf/blob/master/watchconf-api/src/main/java/com/librato/watchconf/adapter/file/DynamicConfigFileAdapter.java)
 
@@ -68,35 +68,38 @@ public interface ChangeListener<T> {
 
 # Example Usage
 
-At Librato we're using [Zookeeper](http://zookeeper.apache.org/) to store configuration that we want to update on the fly and have watchconf notify our service. Say we have a clustered service named ```WebService``` and we're storing our configuration in JSON in a znode named `/services/webservice/config`. First we need to create a POJO representation of our config, in this case we have one named ```WebServiceConfig```.
-
+At Librato we're using [Zookeeper](http://zookeeper.apache.org/) to store configuration that we want to update on the fly and have watchconf notify our service. One place it's particularly useful is controlling the Kafka producers in our streaming teir. Let's say we're storing our configuration in JSON in a znode named `/services/kafka/config`. First we need to create a POJO representation of our config, in this case we have one named ```KafkaConfig```.
 ```java
-public class WebServiceConfig {
-  
-  public int version;
-  public String someUrl;
-  
-  public KafkaConfig kafkaConfig;
-  
-  public static class KafkaConfig {
-    
-    public int queueTimeMs;
-    public int batchSize;
-  }
-}
-```
+public class KafkaConfig {
+    public List<Broker> defaultBrokers;
+    public List<Topic> topics = new ArrayList();
 
-In order to watch our ```WebServiceConfig``` we first need a ```CuratorFramework``` instance. We then extend the Zookeeper adapter and use the ```JsonConverter```.
-
-```java
- public static class WebServiceAdapter extends DynamicConfigZKAdapter<WebServiceConfig> 
-   implements ChangeListener<WebServiceConfig> {
-    
-    public WebServiceAdapter(CuratorFramework curatorFramework) throws Exception {
-      super("/services/webservice/config", curatorFramework, new JsonConverter<WebServiceConfig>());
+    public static class Topic {
+        public String name;
+        public List<Broker> brokers = new ArrayList();
     }
     
-    public void onChange(Optional<WebServiceConfig> config) {
+    public static class Broker {
+        public int id;
+        public String ipAddress;
+        public int port;
+        public boolean produce = true;
+    }
+}
+```
+With this configuration we can define a default set of brokers for our service (and denote whether they are eligible for receiving data from our producers. We can also override our broker configuration on a per topic basis, sending output from different streaming topologies into different brokers.
+
+In order to watch our ```KafkaConfig``` we first need a ```CuratorFramework``` instance. We then extend the Zookeeper adapter and use the ```JsonConverter```.
+
+```java
+ public static class KafkaConfigAdapter extends DynamicConfigZKAdapter<KafkaConfig> 
+   implements ChangeListener<KafkaConfig> {
+    
+    public KafkaConfigAdapter(CuratorFramework curatorFramework) throws Exception {
+      super("/services/kafka/config", curatorFramework, new JsonConverter<KafkaConfig>());
+    }
+    
+    public void onChange(Optional<KafkaConfig> config) {
       doSomething(config);
     }
  }
@@ -108,7 +111,7 @@ In order to watch our ```WebServiceConfig``` we first need a ```CuratorFramework
                 .build();
         framework.start();
   
- DynamicConfig<WebServiceConfig> config = new WebServiceAdapter(framwork);
+ DynamicConfig<KafkaConfig> config = new KafkaConfigAdapter(framework);
 ```
 
 # Testing
