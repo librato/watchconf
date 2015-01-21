@@ -13,7 +13,7 @@ To use this extension on Maven-based projects, use following dependency:
 <dependency>
   <groupId>com.librato.watchconf</groupId>
   <artifactId>watchconf-api</artifactId>
-  <version>0.0.7</version>
+  <version>0.0.8</version>
 </dependency>
 ```
 
@@ -149,7 +149,7 @@ Upon initial instantiatation of an adapter, if there are errors parsing a config
 
 The watchconf-util package comes with a utility for parsing and pushing configuration into zookeeper. At librato we keep configuration in YAML stored in a repo. If I want to push changes to a cluster I would update the YAML, push to our repo and deploy to Zookeeper. To run the configuration push utility enter
 
-```java -jar ./target/watchconf-util-0.0.7-SNAPSHOT.jar```
+```java -jar ./target/watchconf-util-0.0.8.jar```
 
 You will be prompted to supply arguments for 5 flags.
 
