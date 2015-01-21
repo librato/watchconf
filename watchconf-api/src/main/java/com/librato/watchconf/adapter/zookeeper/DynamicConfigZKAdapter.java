@@ -27,7 +27,7 @@ public abstract class DynamicConfigZKAdapter<T> extends AbstractConfigAdapter<T,
 
         if (curatorFramework.checkExists().forPath(path) == null) {
             try {
-                curatorFramework.create().creatingParentsIfNeeded().forPath(path);
+                curatorFramework.create().creatingParentsIfNeeded().forPath(path, "{}".getBytes());
             } catch (KeeperException.NodeExistsException ex) {
                 log.info("Node exists on create, continuing");
             }
