@@ -5,7 +5,7 @@
     <groupId>com.librato.watchconf</groupId>
     <artifactId>watchconf</artifactId>
     <packaging>pom</packaging>
-    <version>0.0.8-SNAPSHOT</version>
+    <version>0.0.8</version>
     <modules>
         <module>watchconf-api</module>
         <module>watchconf-util</module>
@@ -14,31 +14,77 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <curator.version>2.4.2</curator.version>
     </properties>
-
     <name>watchconf</name>
     <url>https://github.com/librato/watchconf</url>
-
+    <licenses>
+        <license>
+            <name>BSD License</name>
+            <url>https://github.com/librato/disco-java/blob/master/LICENSE</url>
+        </license>
+    </licenses>
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
     <scm>
         <url>https://github.com/librato/watchconf/</url>
         <connection>scm:git:git://github.com/librato/watchconf</connection>
         <developerConnection>scm:git:git@github.com:librato/watchconf</developerConnection>
         <tag>HEAD</tag>
     </scm>
+    <profiles>
+        <profile>
+            <id>release-sign-artifacts</id>
+            <activation>
+                <property>
+                    <name>gpg.passphrase</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>2.5.1</version>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
-                <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
-                </configuration>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -55,17 +101,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <distributionManagement>
-        <repository>
-            <id>librato.deployment</id>
-            <name>Librato Internal Repository</name>
-            <url>https://maven.librato.com/nexus/content/repositories/releases/</url>
-        </repository>
-        <snapshotRepository>
-            <id>librato.deployment</id>
-            <name>Librato Internal Repository</name>
-            <url>https://maven.librato.com/nexus/content/repositories/snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
 </project>
