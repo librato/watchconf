@@ -68,7 +68,7 @@ public interface ChangeListener<T> {
 
 # Example Usage
 
-At Librato we're using [Zookeeper](http://zookeeper.apache.org/) to store configuration that we want to update on the fly and have watchconf notify our service. One place it's particularly useful is controlling the Kafka producers in our streaming teir. Let's say we're storing our configuration in JSON in a znode named `/services/kafka/config`. First we need to create a POJO representation of our config, in this case we have one named ```KafkaConfig```.
+At Librato we're using [Zookeeper](http://zookeeper.apache.org/) to store configuration that we want to update on the fly and have watchconf notify our service. One place it's particularly useful is controlling the Kafka producers in our streaming tier. Let's say we're storing our configuration in JSON in a znode named `/services/kafka/config`. First we need to create a POJO representation of our config, in this case we have one named ```KafkaConfig```.
 ```java
 public class KafkaConfig {
     public List<Broker> defaultBrokers;
