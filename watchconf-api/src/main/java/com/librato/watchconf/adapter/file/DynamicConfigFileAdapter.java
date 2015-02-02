@@ -20,16 +20,14 @@ public abstract class DynamicConfigFileAdapter<T> extends AbstractConfigAdapter<
     private static final Logger log = LoggerFactory.getLogger(DynamicConfigFileAdapter.class);
     private final File file;
     private final Executor fileWatchExecutor = Executors.newSingleThreadExecutor();
-    private final Class<T> clazz;
 
     public DynamicConfigFileAdapter(Class<T> clazz, String path, Converter<T, byte[]> converter, ChangeListener<T> changeListener) throws IOException, InterruptedException {
-        super(converter, Optional.fromNullable(changeListener));
-        this.clazz = clazz;
+        super(clazz, converter, Optional.fromNullable(changeListener));
         Preconditions.checkArgument(path != null && !path.isEmpty(), "path cannot be null or blank");
         Preconditions.checkArgument(converter != null, "converter cannot be null");
         this.file = new File(stripSlash(path));
 
-        getAndSet(readFile(),clazz);
+        getAndSet(readFile());
 
         WatchService watcher = FileSystems.getDefault().newWatchService();
         Path dir = Paths.get(path.substring(0, path.lastIndexOf("/")));
@@ -109,7 +107,7 @@ public abstract class DynamicConfigFileAdapter<T> extends AbstractConfigAdapter<
                         WatchEvent<Path> ev = (WatchEvent<Path>) event;
                         Path fileName = ev.context();
                         if (this.fileName.equals(fileName.toString())) {
-                            adapter.getAndSet(adapter.readFile(), adapter.clazz);
+                            adapter.getAndSet(adapter.readFile());
                             adapter.notifyListeners();
                         }
                     }

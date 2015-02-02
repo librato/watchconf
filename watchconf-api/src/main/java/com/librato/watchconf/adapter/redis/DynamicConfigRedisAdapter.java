@@ -24,11 +24,11 @@ public abstract class DynamicConfigRedisAdapter<T> extends AbstractConfigAdapter
     }
 
     public DynamicConfigRedisAdapter(final Class<T> clazz, final String path, final JedisPool jedisPool, Converter<T, byte[]> converter, ChangeListener<T> changeListener) throws Exception {
-        super(converter, Optional.fromNullable(changeListener));
+        super(clazz, converter, Optional.fromNullable(changeListener));
         Preconditions.checkArgument(path != null && !path.isEmpty(), "path cannot be null or blank");
         this.jedisPool = jedisPool;
 
-        getAndSet(jedisPool.getResource().get(path).getBytes(), clazz);
+        getAndSet(jedisPool.getResource().get(path).getBytes());
 
         jedisPool.getResource().configSet("notify-keyspace-events", "AKE");
         redisExecutor.execute(new Runnable() {
@@ -46,7 +46,7 @@ public abstract class DynamicConfigRedisAdapter<T> extends AbstractConfigAdapter
                     public void onPMessage(String s, String s1, String s2) {
                         String value = jedisPool.getResource().get(path);
                         if(value != null) {
-                            getAndSet(value.getBytes(), clazz);
+                            getAndSet(value.getBytes());
                             notifyListeners();
                         }
 

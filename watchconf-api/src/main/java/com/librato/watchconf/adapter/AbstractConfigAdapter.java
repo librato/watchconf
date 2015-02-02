@@ -18,9 +18,11 @@ public abstract class AbstractConfigAdapter<T, V> implements DynamicConfig<T> {
     protected final List<ChangeListener> changeListenerList = new ArrayList();
     protected final AtomicReference<Optional<T>> config = new AtomicReference(Optional.absent());
     protected final Converter<T, V> converter;
+    protected final Class<T> clazz;
 
-    protected AbstractConfigAdapter(Converter<T, V> converter, Optional<ChangeListener<T>> changeListener) {
+    protected AbstractConfigAdapter(Class<T> clazz, Converter<T, V> converter, Optional<ChangeListener<T>> changeListener) {
         Preconditions.checkArgument(converter != null, "converter cannot be null");
+        this.clazz = clazz;
         this.converter = converter;
 
         if (changeListener.isPresent()) {
@@ -32,9 +34,9 @@ public abstract class AbstractConfigAdapter<T, V> implements DynamicConfig<T> {
         return config.get();
     }
 
-    protected void getAndSet(V v, Class<T> t) {
+    protected void getAndSet(V v) {
         try {
-            config.set(Optional.of(converter.toDomain(v, t)));
+            config.set(Optional.of(converter.toDomain(v, clazz)));
         } catch (Exception ex) {
             log.error("unable to parse config", ex);
             notifyListenersOnError(ex);
