@@ -20,14 +20,16 @@ public abstract class DynamicConfigFileAdapter<T> extends AbstractConfigAdapter<
     private static final Logger log = LoggerFactory.getLogger(DynamicConfigFileAdapter.class);
     private final File file;
     private final Executor fileWatchExecutor = Executors.newSingleThreadExecutor();
+    private final Class<T> clazz;
 
-    public DynamicConfigFileAdapter(String path, Converter<T, byte[]> converter, ChangeListener<T> changeListener) throws IOException, InterruptedException {
+    public DynamicConfigFileAdapter(Class<T> clazz, String path, Converter<T, byte[]> converter, ChangeListener<T> changeListener) throws IOException, InterruptedException {
         super(converter, Optional.fromNullable(changeListener));
+        this.clazz = clazz;
         Preconditions.checkArgument(path != null && !path.isEmpty(), "path cannot be null or blank");
         Preconditions.checkArgument(converter != null, "converter cannot be null");
         this.file = new File(stripSlash(path));
 
-        getAndSet(readFile());
+        getAndSet(readFile(),clazz);
 
         WatchService watcher = FileSystems.getDefault().newWatchService();
         Path dir = Paths.get(path.substring(0, path.lastIndexOf("/")));
@@ -36,8 +38,8 @@ public abstract class DynamicConfigFileAdapter<T> extends AbstractConfigAdapter<
         fileWatchExecutor.execute(fileWatcher);
     }
 
-    public DynamicConfigFileAdapter(String path, Converter<T, byte[]> converter) throws IOException, InterruptedException {
-        this(path, converter, null);
+    public DynamicConfigFileAdapter(Class<T> clazz, String path, Converter<T, byte[]> converter) throws IOException, InterruptedException {
+        this(clazz, path, converter, null);
     }
 
     private String stripSlash(String path) {
@@ -107,7 +109,7 @@ public abstract class DynamicConfigFileAdapter<T> extends AbstractConfigAdapter<
                         WatchEvent<Path> ev = (WatchEvent<Path>) event;
                         Path fileName = ev.context();
                         if (this.fileName.equals(fileName.toString())) {
-                            adapter.getAndSet(adapter.readFile());
+                            adapter.getAndSet(adapter.readFile(), adapter.clazz);
                             adapter.notifyListeners();
                         }
                     }

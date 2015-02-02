@@ -18,19 +18,17 @@ public abstract class DynamicConfigRedisAdapter<T> extends AbstractConfigAdapter
     private final Logger log = LoggerFactory.getLogger(DynamicConfigRedisAdapter.class);
     private final JedisPool jedisPool;
     private final ExecutorService redisExecutor = Executors.newSingleThreadExecutor();
-    private final String path;
 
-    public DynamicConfigRedisAdapter(String path, JedisPool jedisPool, Converter<T, byte[]> converter) throws Exception {
-        this(path, jedisPool, converter, null);
+    public DynamicConfigRedisAdapter(Class<T> clazz, String path, JedisPool jedisPool, Converter<T, byte[]> converter) throws Exception {
+        this(clazz, path, jedisPool, converter, null);
     }
 
-    public DynamicConfigRedisAdapter(final String path, final JedisPool jedisPool, Converter<T, byte[]> converter, ChangeListener<T> changeListener) throws Exception {
+    public DynamicConfigRedisAdapter(final Class<T> clazz, final String path, final JedisPool jedisPool, Converter<T, byte[]> converter, ChangeListener<T> changeListener) throws Exception {
         super(converter, Optional.fromNullable(changeListener));
         Preconditions.checkArgument(path != null && !path.isEmpty(), "path cannot be null or blank");
         this.jedisPool = jedisPool;
-        this.path = path;
 
-        getAndSet(jedisPool.getResource().get(path).getBytes());
+        getAndSet(jedisPool.getResource().get(path).getBytes(), clazz);
 
         jedisPool.getResource().configSet("notify-keyspace-events", "AKE");
         redisExecutor.execute(new Runnable() {
@@ -48,7 +46,7 @@ public abstract class DynamicConfigRedisAdapter<T> extends AbstractConfigAdapter
                     public void onPMessage(String s, String s1, String s2) {
                         String value = jedisPool.getResource().get(path);
                         if(value != null) {
-                            getAndSet(value.getBytes());
+                            getAndSet(value.getBytes(), clazz);
                             notifyListeners();
                         }
 

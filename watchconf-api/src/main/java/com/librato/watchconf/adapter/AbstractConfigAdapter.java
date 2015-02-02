@@ -15,7 +15,6 @@ import java.util.concurrent.atomic.AtomicReference;
 public abstract class AbstractConfigAdapter<T, V> implements DynamicConfig<T> {
 
     private static final Logger log = LoggerFactory.getLogger(AbstractConfigAdapter.class);
-    protected final Class<T> clazz;
     protected final List<ChangeListener> changeListenerList = new ArrayList();
     protected final AtomicReference<Optional<T>> config = new AtomicReference(Optional.absent());
     protected final Converter<T, V> converter;
@@ -23,7 +22,6 @@ public abstract class AbstractConfigAdapter<T, V> implements DynamicConfig<T> {
     protected AbstractConfigAdapter(Converter<T, V> converter, Optional<ChangeListener<T>> changeListener) {
         Preconditions.checkArgument(converter != null, "converter cannot be null");
         this.converter = converter;
-        this.clazz = getClassForType();
 
         if (changeListener.isPresent()) {
             registerListener(changeListener.get());
@@ -34,9 +32,9 @@ public abstract class AbstractConfigAdapter<T, V> implements DynamicConfig<T> {
         return config.get();
     }
 
-    protected void getAndSet(V v) {
+    protected void getAndSet(V v, Class<T> t) {
         try {
-            config.set(Optional.of(converter.toDomain(v, clazz)));
+            config.set(Optional.of(converter.toDomain(v, t)));
         } catch (Exception ex) {
             log.error("unable to parse config", ex);
             notifyListenersOnError(ex);
@@ -61,11 +59,6 @@ public abstract class AbstractConfigAdapter<T, V> implements DynamicConfig<T> {
         for (ChangeListener changeListener : changeListenerList) {
             changeListener.onError(ex);
         }
-    }
-
-
-    private Class<T> getClassForType() {
-        return (Class<T>) (((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments())[0];
     }
 
     @Override

@@ -25,7 +25,7 @@ public class DynamicConfigZKAdapterTest {
     private class ExampleConfigAdapter extends DynamicConfigZKAdapter<ExampleConfig> {
 
         public ExampleConfigAdapter(CuratorFramework curatorFramework) throws Exception {
-            super("/test/config", curatorFramework, new JsonConverter<ExampleConfig>());
+            super(ExampleConfig.class, "/test/config", curatorFramework, new JsonConverter<ExampleConfig>());
         }
     }
 

@@ -26,7 +26,7 @@ public class DynamicConfigRedisAdapterIT {
     public static class ExampleConfigAdapter extends DynamicConfigRedisAdapter<ExampleConfig> {
 
         public ExampleConfigAdapter(JedisPool jedis, ChangeListener<ExampleConfig> changeListener) throws Exception {
-            super("config", jedis, new JsonConverter<ExampleConfig>(), changeListener);
+            super(ExampleConfig.class, "config", jedis, new JsonConverter<ExampleConfig>(), changeListener);
         }
     }
 
