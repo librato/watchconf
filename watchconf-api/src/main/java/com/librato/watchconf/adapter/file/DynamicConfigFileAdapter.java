@@ -21,8 +21,8 @@ public abstract class DynamicConfigFileAdapter<T> extends AbstractConfigAdapter<
     private final File file;
     private final Executor fileWatchExecutor = Executors.newSingleThreadExecutor();
 
-    public DynamicConfigFileAdapter(String path, Converter<T, byte[]> converter, ChangeListener<T> changeListener) throws IOException, InterruptedException {
-        super(converter, Optional.fromNullable(changeListener));
+    public DynamicConfigFileAdapter(Class<T> clazz, String path, Converter<T, byte[]> converter, ChangeListener<T> changeListener) throws IOException, InterruptedException {
+        super(clazz, converter, Optional.fromNullable(changeListener));
         Preconditions.checkArgument(path != null && !path.isEmpty(), "path cannot be null or blank");
         Preconditions.checkArgument(converter != null, "converter cannot be null");
         this.file = new File(stripSlash(path));
@@ -36,8 +36,8 @@ public abstract class DynamicConfigFileAdapter<T> extends AbstractConfigAdapter<
         fileWatchExecutor.execute(fileWatcher);
     }
 
-    public DynamicConfigFileAdapter(String path, Converter<T, byte[]> converter) throws IOException, InterruptedException {
-        this(path, converter, null);
+    public DynamicConfigFileAdapter(Class<T> clazz, String path, Converter<T, byte[]> converter) throws IOException, InterruptedException {
+        this(clazz, path, converter, null);
     }
 
     private String stripSlash(String path) {

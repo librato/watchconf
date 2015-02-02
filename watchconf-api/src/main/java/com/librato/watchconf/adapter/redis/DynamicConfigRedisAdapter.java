@@ -18,17 +18,15 @@ public abstract class DynamicConfigRedisAdapter<T> extends AbstractConfigAdapter
     private final Logger log = LoggerFactory.getLogger(DynamicConfigRedisAdapter.class);
     private final JedisPool jedisPool;
     private final ExecutorService redisExecutor = Executors.newSingleThreadExecutor();
-    private final String path;
 
-    public DynamicConfigRedisAdapter(String path, JedisPool jedisPool, Converter<T, byte[]> converter) throws Exception {
-        this(path, jedisPool, converter, null);
+    public DynamicConfigRedisAdapter(Class<T> clazz, String path, JedisPool jedisPool, Converter<T, byte[]> converter) throws Exception {
+        this(clazz, path, jedisPool, converter, null);
     }
 
-    public DynamicConfigRedisAdapter(final String path, final JedisPool jedisPool, Converter<T, byte[]> converter, ChangeListener<T> changeListener) throws Exception {
-        super(converter, Optional.fromNullable(changeListener));
+    public DynamicConfigRedisAdapter(final Class<T> clazz, final String path, final JedisPool jedisPool, Converter<T, byte[]> converter, ChangeListener<T> changeListener) throws Exception {
+        super(clazz, converter, Optional.fromNullable(changeListener));
         Preconditions.checkArgument(path != null && !path.isEmpty(), "path cannot be null or blank");
         this.jedisPool = jedisPool;
-        this.path = path;
 
         getAndSet(jedisPool.getResource().get(path).getBytes());
 

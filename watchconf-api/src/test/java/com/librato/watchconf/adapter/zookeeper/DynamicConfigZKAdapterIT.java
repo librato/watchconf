@@ -27,11 +27,11 @@ public class DynamicConfigZKAdapterIT {
     private class ExampleConfigAdapter extends DynamicConfigZKAdapter<ExampleConfig> {
 
         public ExampleConfigAdapter(CuratorFramework curatorFramework) throws Exception {
-            super("/watchconf/test/config", curatorFramework, new JsonConverter<ExampleConfig>());
+            super(ExampleConfig.class, "/watchconf/test/config", curatorFramework, new JsonConverter<ExampleConfig>());
         }
 
         public ExampleConfigAdapter(CuratorFramework curatorFramework, ChangeListener<ExampleConfig> changeListener) throws Exception {
-            super("/watchconf/test/config", curatorFramework, new JsonConverter<ExampleConfig>(), changeListener);
+            super(ExampleConfig.class,"/watchconf/test/config", curatorFramework, new JsonConverter<ExampleConfig>(), changeListener);
         }
     }
 

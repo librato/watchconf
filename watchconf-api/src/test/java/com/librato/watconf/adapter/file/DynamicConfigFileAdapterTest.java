@@ -21,11 +21,11 @@ public class DynamicConfigFileAdapterTest {
 
     public static class ExampleConfigAdapter extends DynamicConfigFileAdapter<ExampleConfig> {
         public ExampleConfigAdapter(String path, Converter<ExampleConfig, byte[]> converter) throws IOException, InterruptedException {
-            super(path, converter);
+            super(ExampleConfig.class, path, converter);
         }
 
         public ExampleConfigAdapter(String path, Converter<ExampleConfig, byte[]> converter, ChangeListener<ExampleConfig> changeListener) throws IOException, InterruptedException {
-            super(path, converter, changeListener);
+            super(ExampleConfig.class, path, converter, changeListener);
         }
     }
 
