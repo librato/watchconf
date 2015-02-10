@@ -167,5 +167,5 @@ If you want to validate your input before commiting to zookeeper use the -c opti
 ```
 
 java -cp <your.jar>:./target/watchconf-util-0.0.11.jar com.librato.watchconf.util.WatchConf -zkServer local
-host:2181 -format yaml -f <input filename> -o json -z <znode output path> -c <you class>
+host:2181 -format yaml -f <input filename> -o json -z <znode output path> -c <class name>
 
