@@ -149,7 +149,7 @@ Upon initial instantiatation of an adapter, if there are errors parsing a config
 
 The watchconf-util package comes with a utility for parsing and pushing configuration into zookeeper. At librato we keep configuration in YAML stored in a repo. If I want to push changes to a cluster I would update the YAML, push to our repo and deploy to Zookeeper. To run the configuration push utility enter
 
-```java -jar ./target/watchconf-util-0.0.10.jar```
+```java -jar ./target/watchconf-util-0.0.11.jar```
 
 You will be prompted to supply arguments for 5 flags.
 
@@ -159,5 +159,13 @@ watchconf: Must specify -zkServer <host:port> and additional required flags
 -f <file>: input file to read from
 -o [yaml|json]: format of data to output to znode
 -z: full path to znode to update, will create parents and node doesn't exist
+-c (Optional) name of class to validate JSON against before pushing
 ```
+
+If you want to validate your input before commiting to zookeeper use the -c option and specify your jar that conatins the Java class representation of your input.
+
+```
+
+java -cp <your.jar>:./target/watchconf-util-0.0.11.jar com.librato.watchconf.util.WatchConf -zkServer local
+host:2181 -format yaml -f <input filename> -o json -z <znode output path>
 
