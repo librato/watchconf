@@ -3,7 +3,6 @@ package com.librato.watchconf.adapter.zookeeper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.librato.ExampleConfig;
 import com.librato.watchconf.converter.JsonConverter;
-import com.sun.corba.se.impl.orbutil.concurrent.Sync;
 import org.apache.curator.CuratorZookeeperClient;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.api.*;
