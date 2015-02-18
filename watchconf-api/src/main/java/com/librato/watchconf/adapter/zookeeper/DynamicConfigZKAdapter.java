@@ -42,7 +42,7 @@ public abstract class DynamicConfigZKAdapter<T> extends AbstractConfigAdapter<T,
         curatorFramework.sync().inBackground(new BackgroundCallback() {
             @Override
             public void processResult(CuratorFramework client, CuratorEvent event) throws Exception {
-                System.out.println("event is: " + event);
+                getAndSet(curatorFramework.getData().forPath(path));
             }
         }).forPath(path);
 
