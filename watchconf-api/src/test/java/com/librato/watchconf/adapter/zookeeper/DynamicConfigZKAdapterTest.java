@@ -35,6 +35,10 @@ public class DynamicConfigZKAdapterTest {
         CuratorFramework curatorFramework = mockFramework();
         GetDataBuilder getDataBuilder = mock(GetDataBuilder.class);
         WatchPathable watchPathable = mock(WatchPathable.class);
+        SyncBuilder syncBuilder = mock(SyncBuilder.class);
+        Pathable pathable = mock(Pathable.class);
+        when(curatorFramework.sync()).thenReturn(syncBuilder);
+        when(syncBuilder.inBackground(any(BackgroundCallback.class))).thenReturn(pathable);
         when(curatorFramework.getZookeeperClient()).thenReturn(mock(CuratorZookeeperClient.class));
         when(curatorFramework.getData()).thenReturn(getDataBuilder);
         when(curatorFramework.getState()).thenReturn(CuratorFrameworkState.STARTED);
@@ -64,9 +68,13 @@ public class DynamicConfigZKAdapterTest {
         CuratorFramework curatorFramework = mockFramework();
         GetDataBuilder getDataBuilder = mock(GetDataBuilder.class);
         WatchPathable watchPathable = mock(WatchPathable.class);
+        SyncBuilder syncBuilder = mock(SyncBuilder.class);
+        Pathable pathable = mock(Pathable.class);
         when(curatorFramework.getZookeeperClient()).thenReturn(mock(CuratorZookeeperClient.class));
         when(curatorFramework.getData()).thenReturn(getDataBuilder);
         when(curatorFramework.getState()).thenReturn(CuratorFrameworkState.STARTED);
+        when(curatorFramework.sync()).thenReturn(syncBuilder);
+        when(syncBuilder.inBackground(any(BackgroundCallback.class))).thenReturn(pathable);
         when(getDataBuilder.storingStatIn(any(Stat.class))).thenReturn(watchPathable);
         when(watchPathable.forPath(anyString())).thenReturn(objectMapper.writeValueAsBytes(exampleConfig));
         when(getDataBuilder.forPath(anyString())).thenReturn(objectMapper.writeValueAsBytes(exampleConfig));
