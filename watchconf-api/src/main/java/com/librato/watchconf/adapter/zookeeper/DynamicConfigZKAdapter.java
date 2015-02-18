@@ -6,6 +6,8 @@ import com.librato.watchconf.DynamicConfig;
 import com.librato.watchconf.adapter.AbstractConfigAdapter;
 import com.librato.watchconf.converter.Converter;
 import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.api.BackgroundCallback;
+import org.apache.curator.framework.api.CuratorEvent;
 import org.apache.curator.framework.imps.CuratorFrameworkState;
 import org.apache.curator.framework.recipes.cache.NodeCache;
 import org.apache.curator.framework.recipes.cache.NodeCacheListener;
@@ -37,14 +39,26 @@ public abstract class DynamicConfigZKAdapter<T> extends AbstractConfigAdapter<T,
             }
         }
 
+        curatorFramework.sync().inBackground(new BackgroundCallback() {
+            @Override
+            public void processResult(CuratorFramework client, CuratorEvent event) throws Exception {
+                System.out.println("event is: " + event);
+            }
+        }).forPath(path);
+
         getAndSet(curatorFramework.getData().forPath(path));
 
         this.nodeCache = new NodeCache(curatorFramework, path);
         this.nodeCacheListener = new NodeCacheListener() {
             @Override
             public void nodeChanged() throws Exception {
-                getAndSet(curatorFramework.getData().forPath(path));
-                notifyListeners();
+                curatorFramework.sync().inBackground(new BackgroundCallback() {
+                    @Override
+                    public void processResult(CuratorFramework client, CuratorEvent event) throws Exception {
+                        getAndSet(curatorFramework.getData().forPath(path));
+                        notifyListeners();
+                    }
+                }).forPath(path);
             }
         };
 
