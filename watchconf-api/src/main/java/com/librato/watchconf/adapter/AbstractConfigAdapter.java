@@ -36,7 +36,8 @@ public abstract class AbstractConfigAdapter<T, V> implements DynamicConfig<T> {
 
     protected void getAndSet(V v) {
         try {
-            config.set(Optional.of(converter.toDomain(v, clazz)));
+            Optional<T> t = Optional.of(converter.toDomain(v, clazz));
+            config.set(t);
         } catch (Exception ex) {
             log.error("unable to parse config", ex);
             notifyListenersOnError(ex);

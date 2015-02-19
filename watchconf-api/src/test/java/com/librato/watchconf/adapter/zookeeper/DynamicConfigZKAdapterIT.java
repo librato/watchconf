@@ -31,7 +31,7 @@ public class DynamicConfigZKAdapterIT {
         }
 
         public ExampleConfigAdapter(CuratorFramework curatorFramework, ChangeListener<ExampleConfig> changeListener) throws Exception {
-            super(ExampleConfig.class,"/watchconf/test/config", curatorFramework, new JsonConverter<ExampleConfig>(), changeListener);
+            super(ExampleConfig.class, "/watchconf/test/config", curatorFramework, new JsonConverter<ExampleConfig>(), changeListener);
         }
     }
 
@@ -75,11 +75,23 @@ public class DynamicConfigZKAdapterIT {
         exampleConfig.name = "test123";
 
         framework.create().creatingParentsIfNeeded().forPath("/watchconf/test/config", objectMapper.writeValueAsBytes(exampleConfig));
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
+        ExampleConfigAdapter exampleConfigAdapter = new ExampleConfigAdapter(framework, new DynamicConfig.ChangeListener<ExampleConfig>() {
+            @Override
+            public void onChange(Optional<ExampleConfig> t) {
+                assertEquals("test123", t.get().name);
+                countDownLatch.countDown();
+            }
 
-        ExampleConfigAdapter exampleConfigAdapter = new ExampleConfigAdapter(framework);
+            @Override
+            public void onError(Exception ex) {
+
+            }
+        });
         Optional<ExampleConfig> fetchedConfig = exampleConfigAdapter.get();
         assertTrue(fetchedConfig.isPresent());
-        assertEquals("test123", fetchedConfig.get().name);
+        countDownLatch.await(10, TimeUnit.SECONDS);
+
     }
 
     @Test
@@ -93,10 +105,8 @@ public class DynamicConfigZKAdapterIT {
 
         final ExampleConfig exampleConfig = new ExampleConfig();
         exampleConfig.name = "test123";
-
         framework.create().creatingParentsIfNeeded().forPath("/watchconf/test/config", objectMapper.writeValueAsBytes(exampleConfig));
-
-        final CountDownLatch countDownLatch = new CountDownLatch(1);
+        final CountDownLatch countDownLatch = new CountDownLatch(2);
         ExampleConfigAdapter exampleConfigAdapter = new ExampleConfigAdapter(framework, new DynamicConfig.ChangeListener<ExampleConfig>() {
             @Override
             public void onChange(Optional<ExampleConfig> t) {
@@ -116,11 +126,61 @@ public class DynamicConfigZKAdapterIT {
                 framework.setData().forPath("/watchconf/test/config", objectMapper.writeValueAsBytes(exampleConfig));
                 return null;
             }
-        }, 3, TimeUnit.SECONDS);
+        }, 1, TimeUnit.SECONDS);
+
         countDownLatch.await(20, TimeUnit.SECONDS);
         assertEquals(0, countDownLatch.getCount());
         Optional<ExampleConfig> fetchedConfig = exampleConfigAdapter.get();
         assertTrue(fetchedConfig.isPresent());
         assertEquals("updated", fetchedConfig.get().name);
+    }
+
+    @Test
+    public void notifyDeleteAndRecreateTest() throws Exception {
+        final CuratorFramework framework = CuratorFrameworkFactory.builder()
+                .connectionTimeoutMs(1000)
+                .connectString("localhost:2181")
+                .retryPolicy(new ExponentialBackoffRetry(1000, 5))
+                .build();
+        framework.start();
+
+        final ExampleConfig exampleConfig = new ExampleConfig();
+        exampleConfig.name = "test123";
+
+        framework.create().creatingParentsIfNeeded().forPath("/watchconf/test/config", objectMapper.writeValueAsBytes(exampleConfig));
+        final CountDownLatch countDownLatch = new CountDownLatch(3);
+
+        ExampleConfigAdapter exampleConfigAdapter = new ExampleConfigAdapter(framework, new DynamicConfig.ChangeListener<ExampleConfig>() {
+            @Override
+            public void onChange(Optional<ExampleConfig> t) {
+                countDownLatch.countDown();
+            }
+
+            @Override
+            public void onError(Exception ex) {
+
+            }
+        });
+
+        Executors.newSingleThreadScheduledExecutor().schedule(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                framework.delete().deletingChildrenIfNeeded().forPath("/watchconf/test/config");
+                return null;
+            }
+        }, 5, TimeUnit.SECONDS);
+
+        Executors.newSingleThreadScheduledExecutor().schedule(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                exampleConfig.name = "ray";
+                framework.create().creatingParentsIfNeeded().forPath("/watchconf/test/config", objectMapper.writeValueAsBytes(exampleConfig));
+                return null;
+            }
+        }, 10, TimeUnit.SECONDS);
+
+        countDownLatch.await(30, TimeUnit.SECONDS);
+        assertEquals(0, countDownLatch.getCount());
+        assertEquals("ray", exampleConfigAdapter.get().get().name);
     }
 }
