@@ -4,12 +4,10 @@ import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.librato.watchconf.DynamicConfig;
 import com.librato.watchconf.adapter.AbstractConfigAdapter;
+import com.librato.watchconf.adapter.WatchConfZKCache;
 import com.librato.watchconf.converter.Converter;
 import org.apache.curator.framework.CuratorFramework;
-import org.apache.curator.framework.api.BackgroundCallback;
-import org.apache.curator.framework.api.CuratorEvent;
 import org.apache.curator.framework.imps.CuratorFrameworkState;
-import org.apache.curator.framework.recipes.cache.NodeCache;
 import org.apache.curator.framework.recipes.cache.NodeCacheListener;
 import org.apache.zookeeper.KeeperException;
 import org.slf4j.Logger;
@@ -19,7 +17,7 @@ public abstract class DynamicConfigZKAdapter<T> extends AbstractConfigAdapter<T,
 
     private Logger log = LoggerFactory.getLogger(DynamicConfig.class);
     private NodeCacheListener nodeCacheListener;
-    private NodeCache nodeCache;
+    private WatchConfZKCache watchConfZKCache;
 
     public DynamicConfigZKAdapter(final Class<T> clazz,
                                   final String path,
@@ -39,31 +37,17 @@ public abstract class DynamicConfigZKAdapter<T> extends AbstractConfigAdapter<T,
             }
         }
 
-        curatorFramework.sync().inBackground(new BackgroundCallback() {
-            @Override
-            public void processResult(CuratorFramework client, CuratorEvent event) throws Exception {
-                getAndSet(curatorFramework.getData().forPath(path));
-            }
-        }).forPath(path);
-
-        getAndSet(curatorFramework.getData().forPath(path));
-
-        this.nodeCache = new NodeCache(curatorFramework, path);
+        this.watchConfZKCache = new WatchConfZKCache(curatorFramework, path);
         this.nodeCacheListener = new NodeCacheListener() {
             @Override
             public void nodeChanged() throws Exception {
-                curatorFramework.sync().inBackground(new BackgroundCallback() {
-                    @Override
-                    public void processResult(CuratorFramework client, CuratorEvent event) throws Exception {
-                        getAndSet(curatorFramework.getData().forPath(path));
-                        notifyListeners();
-                    }
-                }).forPath(path);
+                getAndSet(watchConfZKCache.getCurrentData());
+                notifyListeners();
             }
         };
 
-        this.nodeCache.getListenable().addListener(nodeCacheListener);
-        this.nodeCache.start(true);
+        this.watchConfZKCache.getListenable().addListener(nodeCacheListener);
+        this.watchConfZKCache.start();
     }
 
     public DynamicConfigZKAdapter(Class<T> clazz, String path, CuratorFramework curatorFramework, Converter converter) throws Exception {
