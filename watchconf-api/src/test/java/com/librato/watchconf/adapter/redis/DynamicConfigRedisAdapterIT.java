@@ -43,6 +43,7 @@ public class DynamicConfigRedisAdapterIT {
         ec.name = "ray";
         pool.getResource().set("config", objectMapper.writeValueAsString(ec));
         ExampleConfigAdapter exampleConfigAdapter = new ExampleConfigAdapter(pool, null);
+        exampleConfigAdapter.start();
         Optional<ExampleConfig> exampleConfig = exampleConfigAdapter.get();
         assertTrue(exampleConfig.isPresent());
         assertEquals("ray", exampleConfig.get().name);
@@ -73,7 +74,7 @@ public class DynamicConfigRedisAdapterIT {
             public void onError(Exception ex) {
 
             }
-        });
+        }).start();
 
         Executors.newSingleThreadScheduledExecutor().schedule(new Runnable() {
             @Override

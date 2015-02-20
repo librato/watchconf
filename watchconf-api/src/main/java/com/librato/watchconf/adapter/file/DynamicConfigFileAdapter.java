@@ -18,26 +18,31 @@ import java.util.concurrent.TimeUnit;
 public abstract class DynamicConfigFileAdapter<T> extends AbstractConfigAdapter<T, byte[]> {
 
     private static final Logger log = LoggerFactory.getLogger(DynamicConfigFileAdapter.class);
-    private final File file;
     private final Executor fileWatchExecutor = Executors.newSingleThreadExecutor();
+    private final String path;
+    private final File file;
 
     public DynamicConfigFileAdapter(Class<T> clazz, String path, Converter<T, byte[]> converter, ChangeListener<T> changeListener) throws IOException, InterruptedException {
         super(clazz, converter, Optional.fromNullable(changeListener));
         Preconditions.checkArgument(path != null && !path.isEmpty(), "path cannot be null or blank");
         Preconditions.checkArgument(converter != null, "converter cannot be null");
+        this.path = path;
         this.file = new File(stripSlash(path));
+    }
 
+    public DynamicConfigFileAdapter(Class<T> clazz, String path, Converter<T, byte[]> converter) throws IOException, InterruptedException {
+        this(clazz, path, converter, null);
+    }
+
+    @Override
+    public void start() throws Exception {
+        started.set(true);
         getAndSet(readFile());
-
         WatchService watcher = FileSystems.getDefault().newWatchService();
         Path dir = Paths.get(path.substring(0, path.lastIndexOf("/")));
         WatchQueueReader fileWatcher = new WatchQueueReader(watcher, path.substring(path.lastIndexOf("/") + 1), this);
         dir.register(watcher, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY);
         fileWatchExecutor.execute(fileWatcher);
-    }
-
-    public DynamicConfigFileAdapter(Class<T> clazz, String path, Converter<T, byte[]> converter) throws IOException, InterruptedException {
-        this(clazz, path, converter, null);
     }
 
     private String stripSlash(String path) {

@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 public abstract class AbstractConfigAdapter<T, V> implements DynamicConfig<T> {
@@ -19,6 +20,7 @@ public abstract class AbstractConfigAdapter<T, V> implements DynamicConfig<T> {
     protected final AtomicReference<Optional<T>> config = new AtomicReference(Optional.absent());
     protected final Converter<T, V> converter;
     protected final Class<T> clazz;
+    protected final AtomicBoolean started = new AtomicBoolean(false);
 
     protected AbstractConfigAdapter(Class<T> clazz, Converter<T, V> converter, Optional<ChangeListener<T>> changeListener) {
         Preconditions.checkArgument(converter != null, "converter cannot be null");
@@ -31,6 +33,7 @@ public abstract class AbstractConfigAdapter<T, V> implements DynamicConfig<T> {
     }
 
     public Optional<T> get() throws Exception {
+        Preconditions.checkArgument(started.get(), "Adapter must be started before calling get");
         return config.get();
     }
 

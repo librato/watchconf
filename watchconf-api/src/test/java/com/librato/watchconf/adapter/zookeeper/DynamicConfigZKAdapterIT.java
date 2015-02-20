@@ -31,7 +31,7 @@ public class DynamicConfigZKAdapterIT {
         }
 
         public ExampleConfigAdapter(CuratorFramework curatorFramework, ChangeListener<ExampleConfig> changeListener) throws Exception {
-            super(ExampleConfig.class,"/watchconf/test/config", curatorFramework, new JsonConverter<ExampleConfig>(), changeListener);
+            super(ExampleConfig.class, "/watchconf/test/config", curatorFramework, new JsonConverter<ExampleConfig>(), changeListener);
         }
     }
 
@@ -77,6 +77,7 @@ public class DynamicConfigZKAdapterIT {
         framework.create().creatingParentsIfNeeded().forPath("/watchconf/test/config", objectMapper.writeValueAsBytes(exampleConfig));
 
         ExampleConfigAdapter exampleConfigAdapter = new ExampleConfigAdapter(framework);
+        exampleConfigAdapter.start();
         Optional<ExampleConfig> fetchedConfig = exampleConfigAdapter.get();
         assertTrue(fetchedConfig.isPresent());
         assertEquals("test123", fetchedConfig.get().name);
@@ -108,6 +109,8 @@ public class DynamicConfigZKAdapterIT {
 
             }
         });
+
+        exampleConfigAdapter.start();
 
         Executors.newSingleThreadScheduledExecutor().schedule(new Callable<Void>() {
             @Override

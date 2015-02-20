@@ -44,6 +44,11 @@ public interface DynamicConfig<T> {
     void removeListener(ChangeListener changeListener);
 
     /**
+     * Start the adapter
+     */
+    void start() throws Exception;
+
+    /**
      * Shutdown a dynamic configuration
      */
     void shutdown() throws Exception;

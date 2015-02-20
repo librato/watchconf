@@ -18,6 +18,7 @@ public abstract class DynamicConfigRedisAdapter<T> extends AbstractConfigAdapter
     private final Logger log = LoggerFactory.getLogger(DynamicConfigRedisAdapter.class);
     private final JedisPool jedisPool;
     private final ExecutorService redisExecutor = Executors.newSingleThreadExecutor();
+    private final String path;
 
     public DynamicConfigRedisAdapter(Class<T> clazz, String path, JedisPool jedisPool, Converter<T, byte[]> converter) throws Exception {
         this(clazz, path, jedisPool, converter, null);
@@ -27,7 +28,11 @@ public abstract class DynamicConfigRedisAdapter<T> extends AbstractConfigAdapter
         super(clazz, converter, Optional.fromNullable(changeListener));
         Preconditions.checkArgument(path != null && !path.isEmpty(), "path cannot be null or blank");
         this.jedisPool = jedisPool;
+        this.path = path;
+    }
 
+    public void start() throws Exception  {
+        started.set(true);
         getAndSet(jedisPool.getResource().get(path).getBytes());
 
         jedisPool.getResource().configSet("notify-keyspace-events", "AKE");
@@ -74,7 +79,6 @@ public abstract class DynamicConfigRedisAdapter<T> extends AbstractConfigAdapter
             }
         });
     }
-
     public void shutdown() throws Exception {
         redisExecutor.shutdown();
         log.info("Waiting for redisExecutor to stop in 10s");
