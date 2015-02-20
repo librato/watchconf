@@ -54,9 +54,9 @@ public abstract class AbstractConfigAdapter<T, V> implements DynamicConfig<T> {
         changeListenerList.remove(changeListener);
     }
 
-    protected void notifyListeners() {
+    protected void notifyListeners(Optional<T> t) {
         for (ChangeListener changeListener : changeListenerList) {
-            changeListener.onChange(config.get());
+            changeListener.onChange(t);
         }
     }
 

@@ -31,7 +31,7 @@ public abstract class DynamicConfigRedisAdapter<T> extends AbstractConfigAdapter
         this.path = path;
     }
 
-    public void start() throws Exception  {
+    public void start() throws Exception {
         started.set(true);
         getAndSet(jedisPool.getResource().get(path).getBytes());
 
@@ -50,9 +50,14 @@ public abstract class DynamicConfigRedisAdapter<T> extends AbstractConfigAdapter
                     @Override
                     public void onPMessage(String s, String s1, String s2) {
                         String value = jedisPool.getResource().get(path);
-                        if(value != null) {
+                        if (value != null) {
                             getAndSet(value.getBytes());
-                            notifyListeners();
+                            try {
+                                notifyListeners(get());
+                            } catch (Exception ex) {
+                                log.error("unable to notify listeners", ex);
+                                notifyListenersOnError(ex);
+                            }
                         }
 
                     }
@@ -79,6 +84,7 @@ public abstract class DynamicConfigRedisAdapter<T> extends AbstractConfigAdapter
             }
         });
     }
+
     public void shutdown() throws Exception {
         redisExecutor.shutdown();
         log.info("Waiting for redisExecutor to stop in 10s");

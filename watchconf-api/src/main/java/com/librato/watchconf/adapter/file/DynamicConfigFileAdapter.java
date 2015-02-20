@@ -113,7 +113,12 @@ public abstract class DynamicConfigFileAdapter<T> extends AbstractConfigAdapter<
                         Path fileName = ev.context();
                         if (this.fileName.equals(fileName.toString())) {
                             adapter.getAndSet(adapter.readFile());
-                            adapter.notifyListeners();
+                            try {
+                                adapter.notifyListeners(adapter.get());
+                            } catch (Exception ex) {
+                                log.error("unable to notify listeners", ex);
+                                adapter.notifyListenersOnError(ex);
+                            }
                         }
                     }
 

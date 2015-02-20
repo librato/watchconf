@@ -49,7 +49,7 @@ public abstract class DynamicConfigZKAdapter<T> extends AbstractConfigAdapter<T,
         this.nodeCacheListener = new NodeCacheListener() {
             @Override
             public void nodeChanged() throws Exception {
-                notifyListeners();
+                notifyListeners(get());
             }
         };
 
