@@ -87,6 +87,7 @@ public class DynamicConfigZKAdapterTest {
         when(existsBuilder.usingWatcher(any(CuratorWatcher.class))).thenReturn(existsBuilder);
         when(existsBuilder.inBackground(any(BackgroundCallback.class))).thenReturn(existsBuilder);
         ExampleConfigAdapter exampleConfigAdapter = new ExampleConfigAdapter(curatorFramework);
+        exampleConfigAdapter.start();
         assertNotNull(exampleConfigAdapter);
         assertTrue(exampleConfigAdapter.get().isPresent());
         assertEquals(exampleConfigAdapter.get().get().name, "ray");

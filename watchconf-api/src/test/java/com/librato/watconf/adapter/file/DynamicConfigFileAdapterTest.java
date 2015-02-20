@@ -33,6 +33,7 @@ public class DynamicConfigFileAdapterTest {
     public void testReadConfig() throws Exception {
         URL url = this.getClass().getResource("/example_config.yml");
         ExampleConfigAdapter exampleConfigAdapter = new ExampleConfigAdapter(url.getFile(), new YAMLConverter<ExampleConfig>());
+        exampleConfigAdapter.start();
         Optional<ExampleConfig> exampleConfig = exampleConfigAdapter.get();
         assertTrue(exampleConfig.isPresent());
         assertEquals(1, exampleConfig.get().id);
@@ -57,6 +58,7 @@ public class DynamicConfigFileAdapterTest {
             }
         });
 
+        exampleConfigAdapter.start();
         ExampleConfig exampleConfig = exampleConfigAdapter.get().get();
         exampleConfig.id = 100;
         exampleConfig.name = "ray";

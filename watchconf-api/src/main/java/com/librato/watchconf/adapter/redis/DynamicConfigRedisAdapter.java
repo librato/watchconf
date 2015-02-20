@@ -18,6 +18,7 @@ public abstract class DynamicConfigRedisAdapter<T> extends AbstractConfigAdapter
     private final Logger log = LoggerFactory.getLogger(DynamicConfigRedisAdapter.class);
     private final JedisPool jedisPool;
     private final ExecutorService redisExecutor = Executors.newSingleThreadExecutor();
+    private final String path;
 
     public DynamicConfigRedisAdapter(Class<T> clazz, String path, JedisPool jedisPool, Converter<T, byte[]> converter) throws Exception {
         this(clazz, path, jedisPool, converter, null);
@@ -27,7 +28,11 @@ public abstract class DynamicConfigRedisAdapter<T> extends AbstractConfigAdapter
         super(clazz, converter, Optional.fromNullable(changeListener));
         Preconditions.checkArgument(path != null && !path.isEmpty(), "path cannot be null or blank");
         this.jedisPool = jedisPool;
+        this.path = path;
+    }
 
+    public void start() throws Exception {
+        started.set(true);
         getAndSet(jedisPool.getResource().get(path).getBytes());
 
         jedisPool.getResource().configSet("notify-keyspace-events", "AKE");
@@ -45,9 +50,14 @@ public abstract class DynamicConfigRedisAdapter<T> extends AbstractConfigAdapter
                     @Override
                     public void onPMessage(String s, String s1, String s2) {
                         String value = jedisPool.getResource().get(path);
-                        if(value != null) {
+                        if (value != null) {
                             getAndSet(value.getBytes());
-                            notifyListeners();
+                            try {
+                                notifyListeners(get());
+                            } catch (Exception ex) {
+                                log.error("unable to notify listeners", ex);
+                                notifyListenersOnError(ex);
+                            }
                         }
 
                     }
