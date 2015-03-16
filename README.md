@@ -1,4 +1,4 @@
-Overview
+Watchconf
 =========
 
 Most of the time if you need to make a configuration change to a service you can modify a file, deploy, and perform a rolling restart across the cluster. But sometimes you would rather not restart. Watchconf aims to address these occasions.
@@ -38,7 +38,7 @@ public interface DynamicConfig<T> {
 
 ### Adapters
 
-Watchconf provides abstract adapter implementations for each source supported by watchconf. To create your ```DynamicConfig``` object simply extend the appropriate adapter, select your converter type, and instantiate.
+Watchconf provides abstract adapter implementations for each supported source. To create your ```DynamicConfig``` object simply extend the appropriate adapter, select your converter type, and instantiate.
 
 * [Zookeeper](https://github.com/librato/watchconf/blob/master/watchconf-api/src/main/java/com/librato/watchconf/adapter/zookeeper/DynamicConfigZKAdapter.java) - used in production at Librato
 * [Redis](https://github.com/librato/watchconf/blob/master/watchconf-api/src/main/java/com/librato/watchconf/adapter/redis/DynamicConfigRedisAdapter.java)
@@ -46,7 +46,7 @@ Watchconf provides abstract adapter implementations for each source supported by
 
 ### Converters
 
-Adapters use the ```Converter``` interface to convert serialized configuration into objects. Watchconf provides converters for various data formats including [JSON](https://github.com/librato/watchconf/blob/master/watchconf-api/src/main/java/com/librato/watchconf/converter/JsonConverter.java) and [YAML](https://github.com/librato/watchconf/blob/master/watchconf-api/src/main/java/com/librato/watchconf/converter/YAMLConverter.java). If you need to support another format simply implement a converter.
+Adapters use the ```Converter``` interface to convert serialized configuration into objects. Watchconf provides converters for various data formats including [JSON](https://github.com/librato/watchconf/blob/master/watchconf-api/src/main/java/com/librato/watchconf/converter/JsonConverter.java) and [YAML](https://github.com/librato/watchconf/blob/master/watchconf-api/src/main/java/com/librato/watchconf/converter/YAMLConverter.java). If you need to support another format, simply implement a converter.
 
 ```java
 public interface Converter<T, V> {
@@ -68,7 +68,7 @@ public interface ChangeListener<T> {
 
 # Example Usage
 
-At Librato we're using [Zookeeper](http://zookeeper.apache.org/) to store configuration that we want to update on the fly and have watchconf notify our service. One place it's particularly useful is controlling the Kafka producers in our streaming tier. Let's say we're storing our configuration in JSON in a znode named `/services/kafka/config`. First we need to create a POJO representation of our config, in this case we have one named ```KafkaConfig```.
+At Librato we're using [Zookeeper](http://zookeeper.apache.org/) to store configuration that we want to update on the fly and have Watchconf notify our service. One place it's particularly useful is controlling the Kafka producers in our streaming tier. Let's say we're storing our configuration in JSON in a znode named `/services/kafka/config`. First we need to create a POJO representation of our config, in this case we have one named ```KafkaConfig```.
 ```java
 public class KafkaConfig {
     public List<Broker> defaultBrokers;
@@ -87,7 +87,7 @@ public class KafkaConfig {
     }
 }
 ```
-With this configuration we can define a default set of brokers for our service (and denote whether they are eligible for receiving data from our producers. We can also override our broker configuration on a per topic basis, sending output from different streaming topologies into different brokers.
+With this configuration we can define a default set of brokers for our service (and denote whether they are eligible for receiving data from our producers. We can also override our broker configuration on a per-topic basis, sending output from different streaming topologies into different brokers.
 
 In order to watch our ```KafkaConfig``` we first need a ```CuratorFramework``` instance. We then extend the Zookeeper adapter and use the ```JsonConverter```.
 
@@ -125,11 +125,11 @@ Unit tests can be run with ```mvn test```. In addition there are integration tes
 
 # Operational Concerns
 
-Upon initial instantiatation of an adapter, if there are errors parsing a configuration or if the resource is non-existant, the ```Optional<T> get()``` method of ```DynamicConfig``` will return a ```Optional.absent()```. If during operation configuration changes are made and errors are encountered, parsing the updated configuration a log message will be written ```log.error("unable to parse config", ex);``` and any ChangeListeners will be notified, but the previous configuration will still be returned in calls to ```Optional<T> get()```. This is by design as we wish to avoid impacting a running service due to a configuration change error.
+Upon initial instantiatation of an adapter, if there are errors parsing a configuration or if the resource is non-existent, the ```Optional<T> get()``` method of ```DynamicConfig``` will return a ```Optional.absent()```. If during operation configuration changes are made and errors are encountered, parsing the updated configuration a log message will be written ```log.error("unable to parse config", ex);``` and any ChangeListeners will be notified, but the previous configuration will still be returned in calls to ```Optional<T> get()```. This is by design as we wish to avoid impacting a running service due to a configuration change error.
 
 ## F.A.Q.
 
-* What happens if I push a bad configuation that causes an error during parse? Will it break my service?
+* What happens if I push a bad configuration that causes an error during parse? Will it break my service?
 
   No, If you push a bad configuration (unparsable) you will most likely see jackson parsing exceptions but your service will continue to run using the last known good configuration. 
   
@@ -152,7 +152,7 @@ Upon initial instantiatation of an adapter, if there are errors parsing a config
 
 ## Watchconf-util
 
-The watchconf-util package comes with a utility for parsing and pushing configuration into zookeeper. At librato we keep configuration in YAML stored in a repo. If I want to push changes to a cluster I would update the YAML, push to our repo and deploy to Zookeeper. To run the configuration push utility enter
+The watchconf-util package comes with a utility for parsing and pushing configuration into zookeeper. At Librato, we keep configuration in YAML stored in a repo. If I want to push changes to a cluster I would update the YAML, push to our repo and deploy to Zookeeper. To run the configuration push utility, enter
 
 ```java -jar ./target/watchconf-util-0.0.11.jar```
 
@@ -167,7 +167,7 @@ watchconf: Must specify -zkServer <host:port> and additional required flags
 -c (Optional) name of class to validate JSON against before pushing
 ```
 
-If you want to validate your input before commiting to zookeeper use the -c option and specify your jar that conatins the Java class representation of your input.
+If you want to validate your input before commiting to zookeeper, use the -c option and specify your jar that contains the Java class representation of your input.
 
 ```
 
