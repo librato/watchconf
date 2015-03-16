@@ -13,7 +13,7 @@ To use this extension on Maven-based projects, use following dependency:
 <dependency>
   <groupId>com.librato.watchconf</groupId>
   <artifactId>watchconf-api</artifactId>
-  <version>0.0.10</version>
+  <version>0.0.13</version>
 </dependency>
 ```
 
