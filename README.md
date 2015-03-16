@@ -96,11 +96,16 @@ In order to watch our ```KafkaConfig``` we first need a ```CuratorFramework``` i
    implements ChangeListener<KafkaConfig> {
     
     public KafkaConfigAdapter(CuratorFramework curatorFramework) throws Exception {
-      super("/services/kafka/config", curatorFramework, new JsonConverter<KafkaConfig>());
+      super(KafkaConfig.class, "/services/kafka/config", curatorFramework, new JsonConverter<KafkaConfig>());
+      registerListener(this);
     }
     
     public void onChange(Optional<KafkaConfig> config) {
       doSomething(config);
+    }
+    
+    public void onError(Exception ex) {
+      ex.printStackTrace();
     }
  }
 
