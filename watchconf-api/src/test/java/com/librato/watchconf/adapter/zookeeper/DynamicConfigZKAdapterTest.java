@@ -9,6 +9,7 @@ import org.apache.curator.framework.api.*;
 import org.apache.curator.framework.imps.CuratorFrameworkState;
 import org.apache.curator.framework.listen.Listenable;
 import org.apache.curator.utils.EnsurePath;
+import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.data.Stat;
 import org.junit.Test;
 
@@ -36,7 +37,7 @@ public class DynamicConfigZKAdapterTest {
         GetDataBuilder getDataBuilder = mock(GetDataBuilder.class);
         WatchPathable watchPathable = mock(WatchPathable.class);
         SyncBuilder syncBuilder = mock(SyncBuilder.class);
-        Pathable pathable = mock(Pathable.class);
+        ErrorListenerPathable pathable = mock(ErrorListenerPathable.class);
         when(curatorFramework.sync()).thenReturn(syncBuilder);
         when(syncBuilder.inBackground(any(BackgroundCallback.class))).thenReturn(pathable);
         when(curatorFramework.getZookeeperClient()).thenReturn(mock(CuratorZookeeperClient.class));
@@ -52,7 +53,7 @@ public class DynamicConfigZKAdapterTest {
         when(ensurePath.excludingLast()).thenReturn(ensurePath);
         when(existsBuilder.forPath("/test/config")).thenReturn(stat);
         when(existsBuilder.usingWatcher(any(CuratorWatcher.class))).thenReturn(existsBuilder);
-        when(existsBuilder.inBackground(any(BackgroundCallback.class))).thenReturn(existsBuilder);
+        when(existsBuilder.inBackground(any(BackgroundCallback.class))).thenReturn(pathable);
         ExampleConfigAdapter exampleConfigAdapter = new ExampleConfigAdapter(curatorFramework);
         assertNotNull(exampleConfigAdapter);
     }
@@ -69,7 +70,7 @@ public class DynamicConfigZKAdapterTest {
         GetDataBuilder getDataBuilder = mock(GetDataBuilder.class);
         WatchPathable watchPathable = mock(WatchPathable.class);
         SyncBuilder syncBuilder = mock(SyncBuilder.class);
-        Pathable pathable = mock(Pathable.class);
+        ErrorListenerPathable pathable = mock(ErrorListenerPathable.class);
         when(curatorFramework.getZookeeperClient()).thenReturn(mock(CuratorZookeeperClient.class));
         when(curatorFramework.getData()).thenReturn(getDataBuilder);
         when(curatorFramework.getState()).thenReturn(CuratorFrameworkState.STARTED);
@@ -84,8 +85,9 @@ public class DynamicConfigZKAdapterTest {
         when(curatorFramework.newNamespaceAwareEnsurePath(anyString())).thenReturn(ensurePath);
         when(ensurePath.excludingLast()).thenReturn(ensurePath);
         when(existsBuilder.forPath("/test/config")).thenReturn(stat);
-        when(existsBuilder.usingWatcher(any(CuratorWatcher.class))).thenReturn(existsBuilder);
-        when(existsBuilder.inBackground(any(BackgroundCallback.class))).thenReturn(existsBuilder);
+        when(existsBuilder.usingWatcher(any(Watcher.class))).thenReturn(existsBuilder);
+        when(existsBuilder.inBackground(any(BackgroundCallback.class))).thenReturn(pathable);
+        when(existsBuilder.creatingParentContainersIfNeeded()).thenReturn(existsBuilder);
         ExampleConfigAdapter exampleConfigAdapter = new ExampleConfigAdapter(curatorFramework);
         exampleConfigAdapter.start();
         assertNotNull(exampleConfigAdapter);
