@@ -99,12 +99,10 @@ public class DynamicConfigZKAdapterIT {
 
         final CountDownLatch countDownLatch = new CountDownLatch(1);
         ExampleConfigAdapter exampleConfigAdapter = new ExampleConfigAdapter(framework, new DynamicConfig.ChangeListener<ExampleConfig>() {
-            @Override
             public void onChange(Optional<ExampleConfig> t) {
                 countDownLatch.countDown();
             }
 
-            @Override
             public void onError(Exception ex) {
 
             }
@@ -113,7 +111,6 @@ public class DynamicConfigZKAdapterIT {
         exampleConfigAdapter.start();
 
         Executors.newSingleThreadScheduledExecutor().schedule(new Callable<Void>() {
-            @Override
             public Void call() throws Exception {
                 exampleConfig.name = "updated";
                 framework.setData().forPath("/watchconf/test/config", objectMapper.writeValueAsBytes(exampleConfig));

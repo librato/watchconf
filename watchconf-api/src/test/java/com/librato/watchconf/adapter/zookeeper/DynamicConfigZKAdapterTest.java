@@ -1,103 +1,56 @@
 package com.librato.watchconf.adapter.zookeeper;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.librato.ExampleConfig;
 import com.librato.watchconf.converter.JsonConverter;
-import org.apache.curator.CuratorZookeeperClient;
 import org.apache.curator.framework.CuratorFramework;
-import org.apache.curator.framework.api.*;
-import org.apache.curator.framework.imps.CuratorFrameworkState;
-import org.apache.curator.framework.listen.Listenable;
-import org.apache.curator.utils.EnsurePath;
-import org.apache.zookeeper.Watcher;
-import org.apache.zookeeper.data.Stat;
+import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.retry.RetryOneTime;
+import org.apache.curator.test.TestingServer;
+import org.junit.Before;
 import org.junit.Test;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertNotNull;
-import static junit.framework.TestCase.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static junit.framework.TestCase.*;
 
 public class DynamicConfigZKAdapterTest {
+    private static final String TEST_PATH = "/test/config";
+    private CuratorFramework curatorFramework;
 
     private class ExampleConfigAdapter extends DynamicConfigZKAdapter<ExampleConfig> {
-
-        public ExampleConfigAdapter(CuratorFramework curatorFramework) throws Exception {
-            super(ExampleConfig.class, "/test/config", curatorFramework, new JsonConverter<ExampleConfig>());
+        ExampleConfigAdapter(CuratorFramework curatorFramework) throws Exception {
+            super(ExampleConfig.class, TEST_PATH, curatorFramework, new JsonConverter<ExampleConfig>());
         }
     }
 
+    @Before
+    public void before() throws Exception {
+        TestingServer server = new TestingServer();
+        curatorFramework = CuratorFrameworkFactory.newClient(server.getConnectString(), new RetryOneTime(1));
+        curatorFramework.start();
+        curatorFramework.create().creatingParentContainersIfNeeded().forPath(TEST_PATH, getExampleBytes());
+    }
+
+    private byte[] getExampleBytes() throws JsonProcessingException {
+        ExampleConfig exampleConfig = new ExampleConfig();
+        exampleConfig.name = "ray";
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.writeValueAsBytes(exampleConfig);
+    }
+
     @Test
-    public void testInitialize() throws Exception {
-        Stat stat = new Stat();
-        CuratorFramework curatorFramework = mockFramework();
-        GetDataBuilder getDataBuilder = mock(GetDataBuilder.class);
-        WatchPathable watchPathable = mock(WatchPathable.class);
-        SyncBuilder syncBuilder = mock(SyncBuilder.class);
-        ErrorListenerPathable pathable = mock(ErrorListenerPathable.class);
-        when(curatorFramework.sync()).thenReturn(syncBuilder);
-        when(syncBuilder.inBackground(any(BackgroundCallback.class))).thenReturn(pathable);
-        when(curatorFramework.getZookeeperClient()).thenReturn(mock(CuratorZookeeperClient.class));
-        when(curatorFramework.getData()).thenReturn(getDataBuilder);
-        when(curatorFramework.getState()).thenReturn(CuratorFrameworkState.STARTED);
-        when(getDataBuilder.storingStatIn(any(Stat.class))).thenReturn(watchPathable);
-        when(watchPathable.forPath(anyString())).thenReturn(new byte[0]);
-        when(getDataBuilder.forPath(anyString())).thenReturn(null);
-        ExistsBuilder existsBuilder = mock(ExistsBuilder.class);
-        EnsurePath ensurePath = mock(EnsurePath.class);
-        when(curatorFramework.checkExists()).thenReturn(existsBuilder);
-        when(curatorFramework.newNamespaceAwareEnsurePath(anyString())).thenReturn(ensurePath);
-        when(ensurePath.excludingLast()).thenReturn(ensurePath);
-        when(existsBuilder.forPath("/test/config")).thenReturn(stat);
-        when(existsBuilder.usingWatcher(any(CuratorWatcher.class))).thenReturn(existsBuilder);
-        when(existsBuilder.inBackground(any(BackgroundCallback.class))).thenReturn(pathable);
+    public void testInit() throws Exception {
         ExampleConfigAdapter exampleConfigAdapter = new ExampleConfigAdapter(curatorFramework);
         assertNotNull(exampleConfigAdapter);
     }
 
     @Test
-    public void testReadConfig() throws Exception {
-
-        ExampleConfig exampleConfig = new ExampleConfig();
-        exampleConfig.name = "ray";
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        Stat stat = new Stat();
-        CuratorFramework curatorFramework = mockFramework();
-        GetDataBuilder getDataBuilder = mock(GetDataBuilder.class);
-        WatchPathable watchPathable = mock(WatchPathable.class);
-        SyncBuilder syncBuilder = mock(SyncBuilder.class);
-        ErrorListenerPathable pathable = mock(ErrorListenerPathable.class);
-        when(curatorFramework.getZookeeperClient()).thenReturn(mock(CuratorZookeeperClient.class));
-        when(curatorFramework.getData()).thenReturn(getDataBuilder);
-        when(curatorFramework.getState()).thenReturn(CuratorFrameworkState.STARTED);
-        when(curatorFramework.sync()).thenReturn(syncBuilder);
-        when(syncBuilder.inBackground(any(BackgroundCallback.class))).thenReturn(pathable);
-        when(getDataBuilder.storingStatIn(any(Stat.class))).thenReturn(watchPathable);
-        when(watchPathable.forPath(anyString())).thenReturn(objectMapper.writeValueAsBytes(exampleConfig));
-        when(getDataBuilder.forPath(anyString())).thenReturn(objectMapper.writeValueAsBytes(exampleConfig));
-        ExistsBuilder existsBuilder = mock(ExistsBuilder.class);
-        EnsurePath ensurePath = mock(EnsurePath.class);
-        when(curatorFramework.checkExists()).thenReturn(existsBuilder);
-        when(curatorFramework.newNamespaceAwareEnsurePath(anyString())).thenReturn(ensurePath);
-        when(ensurePath.excludingLast()).thenReturn(ensurePath);
-        when(existsBuilder.forPath("/test/config")).thenReturn(stat);
-        when(existsBuilder.usingWatcher(any(Watcher.class))).thenReturn(existsBuilder);
-        when(existsBuilder.inBackground(any(BackgroundCallback.class))).thenReturn(pathable);
-        when(existsBuilder.creatingParentContainersIfNeeded()).thenReturn(existsBuilder);
+    public void testRead() throws Exception {
         ExampleConfigAdapter exampleConfigAdapter = new ExampleConfigAdapter(curatorFramework);
         exampleConfigAdapter.start();
         assertNotNull(exampleConfigAdapter);
         assertTrue(exampleConfigAdapter.get().isPresent());
         assertEquals(exampleConfigAdapter.get().get().name, "ray");
-    }
-
-    private CuratorFramework mockFramework() {
-        CuratorFramework framework = mock(CuratorFramework.class);
-        when(framework.getConnectionStateListenable()).thenReturn(mock(Listenable.class));
-        return framework;
     }
 }
