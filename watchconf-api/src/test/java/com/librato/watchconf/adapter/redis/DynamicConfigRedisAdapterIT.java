@@ -60,7 +60,6 @@ public class DynamicConfigRedisAdapterIT {
 
         final CountDownLatch countDownLatch = new CountDownLatch(1);
         new ExampleConfigAdapter(pool, new DynamicConfig.ChangeListener<ExampleConfig>() {
-            @Override
             public void onChange(Optional<ExampleConfig> t) {
                 assertTrue(t.isPresent());
                 assertEquals(2, t.get().id);
@@ -70,14 +69,12 @@ public class DynamicConfigRedisAdapterIT {
                 countDownLatch.countDown();
             }
 
-            @Override
             public void onError(Exception ex) {
 
             }
         }).start();
 
         Executors.newSingleThreadScheduledExecutor().schedule(new Runnable() {
-            @Override
             public void run() {
                 ExampleConfig ec = new ExampleConfig();
                 ec.id = 2;

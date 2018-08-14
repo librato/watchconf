@@ -29,7 +29,7 @@ public abstract class DynamicConfigZKAdapter<T> extends AbstractConfigAdapter<T,
         super(clazz, converter, Optional.fromNullable(changeListener));
         Preconditions.checkNotNull(curatorFramework, "CuratorFramework cannot be null");
         Preconditions.checkArgument(curatorFramework.getState() == CuratorFrameworkState.STARTED, "CuratorFramework must be started");
-        Preconditions.checkArgument(path != null && !path.isEmpty(), "path cannot be null or blank");
+        Preconditions.checkArgument(path != null && !"".equals(path), "path cannot be null or blank");
 
         this.curatorFramework = curatorFramework;
         this.path = path;
@@ -47,7 +47,6 @@ public abstract class DynamicConfigZKAdapter<T> extends AbstractConfigAdapter<T,
         }
 
         this.nodeCacheListener = new NodeCacheListener() {
-            @Override
             public void nodeChanged() throws Exception {
                 notifyListeners(get());
             }

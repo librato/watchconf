@@ -47,12 +47,10 @@ public class DynamicConfigFileAdapterTest {
         URL url = this.getClass().getResource("/example_config.yml");
         final CountDownLatch countDownLatch = new CountDownLatch(1);
         ExampleConfigAdapter exampleConfigAdapter = new ExampleConfigAdapter(url.getFile(), new YAMLConverter<ExampleConfig>(), new DynamicConfig.ChangeListener<ExampleConfig>() {
-            @Override
             public void onChange(Optional<ExampleConfig> t) {
                 countDownLatch.countDown();
             }
 
-            @Override
             public void onError(Exception ex) {
 
             }
