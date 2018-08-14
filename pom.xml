@@ -5,7 +5,7 @@
     <groupId>com.librato.watchconf</groupId>
     <artifactId>watchconf</artifactId>
     <packaging>pom</packaging>
-    <version>0.0.16-SNAPSHOT</version>
+    <version>0.0.16</version>
     <modules>
         <module>watchconf-api</module>
         <module>watchconf-util</module>
