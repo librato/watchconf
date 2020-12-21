@@ -7,7 +7,6 @@ jobs:
       - image: circleci/redis
       - image: wurstmeister/zookeeper
     steps:
-      - add_ssh_keys
       - checkout
       - run: mvn test
 
