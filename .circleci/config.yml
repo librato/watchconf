@@ -1,0 +1,17 @@
+version: 2.1
+
+jobs:
+  setup_and_test:
+    docker:
+      - image: cimg/openjdk:12.0
+      - image: circleci/redis
+      - image: wurstmeister/zookeeper
+    steps:
+      - add_ssh_keys
+      - checkout
+      - run: mvn test
+
+workflows:
+  maven_test:
+    jobs:
+      - setup_and_test
